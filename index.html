@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d12" />
+  <meta name="description" content="AI UGC Studio — create affiliate-ready campaign prompts from a character and product reference." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <title>AI UGC Studio</title>
+  <style>
+    :root{
+      --bg:#0b0d12;--panel:#121620;--panel2:#171c28;--text:#f7f8fb;
+      --muted:#9aa4b2;--line:#252c3a;--accent:#7c5cff;--accent2:#9b8cff;
+      --radius:20px;--shadow:0 18px 60px rgba(0,0,0,.32)
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);min-height:100vh;
+      background:radial-gradient(circle at 20% -10%,rgba(124,92,255,.28),transparent 32%),
+                 radial-gradient(circle at 100% 10%,rgba(56,189,248,.12),transparent 25%),var(--bg)
+    }
+    .app{max-width:1200px;margin:0 auto;padding:24px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:800;
+      background:linear-gradient(135deg,var(--accent),#4fd1c5);box-shadow:0 10px 30px rgba(124,92,255,.35)}
+    .brand h1{font-size:18px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}
+    .badge{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);
+      padding:8px 12px;border-radius:999px;font-size:12px}
+    .hero{padding:34px;border:1px solid var(--line);border-radius:28px;
+      background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+      box-shadow:var(--shadow);margin-bottom:22px}
+    .hero h2{font-size:clamp(30px,6vw,58px);line-height:1.02;margin:0 0 14px;max-width:850px}
+    .hero p{max-width:760px;color:var(--muted);font-size:16px;line-height:1.6;margin:0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .card{background:rgba(18,22,32,.92);border:1px solid var(--line);border-radius:var(--radius);
+      padding:20px;box-shadow:0 12px 34px rgba(0,0,0,.18)}
+    .card h3{margin:0 0 6px;font-size:17px}.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+    .upload{position:relative;border:1.5px dashed #394255;border-radius:16px;min-height:210px;
+      display:grid;place-items:center;text-align:center;overflow:hidden;background:#0f131b}
+    .upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .upload img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+    .placeholder{padding:28px;color:var(--muted);z-index:1}.placeholder strong{display:block;color:var(--text);margin-bottom:8px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
+    input[type="text"],textarea,select{width:100%;border:1px solid var(--line);background:#0f131b;color:var(--text);
+      border-radius:12px;padding:12px 13px;font:inherit;outline:none}
+    textarea{min-height:94px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+    button{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;font:inherit}
+    .primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+    .secondary{background:#1a2030;color:var(--text);border:1px solid var(--line)}
+    .ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+    .output{margin-top:18px;display:none}.output.show{display:block}
+    .output-card{border:1px solid var(--line);background:#0f131b;border-radius:16px;padding:16px;margin-top:12px}
+    .output-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+    .output-head h4{margin:0;font-size:14px}.copy{padding:8px 10px;font-size:12px;background:#20283a;color:var(--text)}
+    pre{margin:0;white-space:pre-wrap;word-wrap:break-word;color:#d8deea;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:13px;line-height:1.55}
+    .install{display:none;margin-bottom:18px}.install.show{display:flex}
+    .footer{color:var(--muted);text-align:center;font-size:12px;padding:26px 0 10px}
+    @media(max-width:800px){.app{padding:16px}.grid,.form-grid{grid-template-columns:1fr}.hero{padding:24px}.topbar{align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">UGC</div>
+        <div><h1>AI UGC Studio</h1><p>Affiliate campaign builder</p></div>
+      </div>
+      <div class="badge">PWA Test Build · v0.2</div>
+    </div>
+
+    <div id="installBanner" class="card install">
+      <div style="flex:1">
+        <h3>Install AI UGC Studio</h3>
+        <div class="sub" style="margin:4px 0 0">Add it to your iPad Home Screen for an app-like experience.</div>
+      </div>
+      <button id="installBtn" class="primary">Install</button>
+    </div>
+
+    <section class="hero">
+      <h2>Turn one character and one product into an affiliate-ready campaign.</h2>
+      <p>Upload your references, choose campaign settings, and generate structured prompts for images, videos, hooks, captions, and calls to action.</p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h3>1. Character Reference</h3>
+        <div class="sub">Used only to preserve identity and visual consistency.</div>
+        <div class="upload" id="characterDrop">
+          <div class="placeholder"><strong>Tap to upload character</strong>JPG, PNG, or WebP</div>
+          <input id="characterInput" type="file" accept="image/*" />
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>2. Product Reference</h3>
+        <div class="sub">The outfit, bag, shoes, skincare, or product to promote.</div>
+        <div class="upload" id="productDrop">
+          <div class="placeholder"><strong>Tap to upload product</strong>Use a clear product image</div>
+          <input id="productInput" type="file" accept="image/*" />
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px">
+      <h3>3. Campaign Settings</h3>
+      <div class="sub">Choose how the campaign should look and feel.</div>
+      <div class="form-grid">
+        <div><label>Product name</label><input id="productName" type="text" placeholder="Example: Navy satin abaya" /></div>
+        <div><label>Platform</label><select id="platform"><option>TikTok</option><option>Instagram Reels</option><option>Shopee Video</option><option>YouTube Shorts</option><option>Amazon</option></select></div>
+        <div><label>Campaign style</label><select id="campaignStyle"><option>Authentic UGC review</option><option>Fashion showcase</option><option>Problem and solution</option><option>Unboxing</option><option>Luxury lifestyle</option><option>Before and after</option></select></div>
+        <div><label>Language</label><select id="language"><option>English</option><option>Bahasa Melayu</option><option>English + Bahasa Melayu</option></select></div>
+        <div><label>Location</label><select id="location"><option>Modern café</option><option>Minimalist living room</option><option>Bright kitchen</option><option>Luxury hotel</option><option>Shopping mall</option><option>Bedroom vanity</option><option>Outdoor city street</option></select></div>
+        <div><label>Number of scenes</label><select id="sceneCount"><option value="3">3 scenes</option><option value="5">5 scenes</option></select></div>
+      </div>
+      <div style="margin-top:14px"><label>Key selling points</label><textarea id="sellingPoints" placeholder="Example: soft fabric, flattering fit, comfortable for all-day wear"></textarea></div>
+      <div class="actions">
+        <button class="primary" id="generateBtn">Generate Campaign</button>
+        <button class="secondary" id="exportBtn">Export TXT</button>
+        <button class="ghost" id="resetBtn">Reset</button>
+      </div>
+    </section>
+
+    <section class="output" id="output"></section>
+    <div class="footer">AI UGC Studio · Local-first PWA test build</div>
+  </div>
+
+<script>
+const $=id=>document.getElementById(id);
+function preview(input,container){
+  input.addEventListener('change',()=>{
+    const file=input.files&&input.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=e=>{container.querySelectorAll('img').forEach(i=>i.remove());const img=document.createElement('img');img.src=e.target.result;container.appendChild(img)};
+    reader.readAsDataURL(file)
+  })
+}
+preview($('characterInput'),$('characterDrop'));preview($('productInput'),$('productDrop'));
+
+const sceneBlueprints=[
+ {title:"Scene 1 — Hook",action:"The creator faces the camera, immediately shows the product, and gives a natural surprised reaction. Start with a strong visual hook in the first second."},
+ {title:"Scene 2 — Demonstration",action:"The creator demonstrates the product naturally, shows important details, and explains the main benefit using relaxed hand movements and authentic expressions."},
+ {title:"Scene 3 — Result and CTA",action:"The creator shows the final result, smiles confidently, looks directly into the camera, and ends with a simple call to action."},
+ {title:"Scene 4 — Detail Close-up",action:"Use a close-up shot to highlight texture, material, stitching, packaging, controls, or other product-specific details."},
+ {title:"Scene 5 — Lifestyle Proof",action:"Show the creator naturally using or wearing the product in a realistic daily-life moment, creating believable social proof."}
+];
+
+function getData(){return{
+ product:$('productName').value.trim()||'the product from the second reference image',
+ platform:$('platform').value,style:$('campaignStyle').value,language:$('language').value,
+ location:$('location').value,scenes:Number($('sceneCount').value),
+ sellingPoints:$('sellingPoints').value.trim()||'quality, usefulness, comfort, and value'
+}}
+function identityPrompt(){return `Use the first reference image only as the character identity reference.
+
+Preserve the same person across every scene. Maintain the same face shape, eyes, nose, lips, skin tone, age, body proportions, facial structure, and overall appearance.
+
+Do not copy clothing or background from the identity image unless requested. Avoid identity drift, face replacement, beauty-filter distortion, age changes, or inconsistent body proportions.
+
+The final result must look like the same real creator filmed during one continuous campaign. Ultra-photorealistic, natural skin texture, realistic eye reflections, authentic human expression, no cartoon style, no artificial plastic skin.`}
+function productPrompt(d){return `Use the second reference image only as the product reference.
+
+Promoted item: ${d.product}
+
+Recreate the product accurately, including its color, shape, fabric or material, pattern, proportions, details, finish, accessories, and overall design. Do not invent logos, colors, prints, features, or packaging that are not visible in the reference.
+
+Place or transfer the product naturally onto the same character while preserving the character's identity. The product should remain clearly visible and commercially presentable.
+
+Key selling points to communicate: ${d.sellingPoints}.`}
+function scenePrompt(d,scene){return `${scene.title}
+
+Create a vertical 9:16 ${d.platform} campaign scene in ${d.language}.
+
+Campaign style: ${d.style}
+Location: ${d.location}
+Product: ${d.product}
+
+${scene.action}
+
+Keep the exact same character identity from the first reference image. Use the second reference image only for product accuracy. Preserve realistic body movement, natural blinking, subtle breathing, believable fabric physics, correct hand anatomy, and consistent lighting.
+
+Camera: authentic handheld creator-style footage, gentle movement, natural framing, shallow depth of field, premium smartphone or DSLR quality.
+Duration: 6–8 seconds.
+Continuity: same creator, same product, same campaign session.
+Avoid: identity drift, product distortion, extra fingers, warped hands, altered logos, fake text, duplicate objects, exaggerated expressions, or overly cinematic advertising that no longer feels like UGC.`}
+function outputCard(title,text){
+ const escaped=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+ return `<div class="output-card"><div class="output-head"><h4>${title}</h4><button class="copy" data-copy="${encodeURIComponent(text)}">Copy</button></div><pre>${escaped}</pre></div>`
+}
+function generateCampaign(){
+ const d=getData(),scenes=sceneBlueprints.slice(0,d.scenes);
+ const hook=`I didn't expect ${d.product} to look this good in real life—here's what surprised me most.`;
+ const caption=`${d.product}: ${d.sellingPoints}. Created for ${d.platform} in a ${d.style.toLowerCase()} style.`;
+ const cta=`Tap the product link to check the current price and available options.`;
+ const hashtags=`#UGC #AffiliateMarketing #ProductReview #TikTokMadeMeBuyIt #ContentCreator`;
+ let html=`<div class="card"><h3>Campaign Generated</h3><div class="sub">Copy individual prompts or export the complete campaign.</div>`;
+ html+=outputCard('Identity Lock',identityPrompt());html+=outputCard('Product Accuracy',productPrompt(d));
+ scenes.forEach(scene=>html+=outputCard(scene.title,scenePrompt(d,scene)));
+ html+=outputCard('Hook',hook)+outputCard('Caption',caption)+outputCard('Call to Action',cta)+outputCard('Hashtags',hashtags)+`</div>`;
+ $('output').innerHTML=html;$('output').classList.add('show');
+ document.querySelectorAll('[data-copy]').forEach(btn=>btn.addEventListener('click',async()=>{
+   const text=decodeURIComponent(btn.dataset.copy);await navigator.clipboard.writeText(text);
+   const old=btn.textContent;btn.textContent='Copied';setTimeout(()=>btn.textContent=old,1000)
+ }));
+ localStorage.setItem('ai-ugc-studio-settings',JSON.stringify(d));
+ window.scrollTo({top:$('output').offsetTop-16,behavior:'smooth'})
+}
+function exportTxt(){
+ if(!$('output').classList.contains('show'))generateCampaign();
+ const text=Array.from($('output').querySelectorAll('.output-card')).map(card=>{
+  const title=card.querySelector('h4').textContent,body=card.querySelector('pre').textContent;
+  return `${title}\n${'='.repeat(title.length)}\n${body}`
+ }).join('\n\n');
+ const blob=new Blob([text],{type:'text/plain'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);a.download='AI-UGC-Studio-Campaign.txt';a.click();URL.revokeObjectURL(a.href)
+}
+$('generateBtn').addEventListener('click',generateCampaign);
+$('exportBtn').addEventListener('click',exportTxt);
+$('resetBtn').addEventListener('click',()=>{if(confirm('Reset the campaign?')){localStorage.removeItem('ai-ugc-studio-settings');location.reload()}});
+
+try{
+ const s=JSON.parse(localStorage.getItem('ai-ugc-studio-settings')||'null');
+ if(s){$('productName').value=s.product||'';$('platform').value=s.platform||'TikTok';$('campaignStyle').value=s.style||'Authentic UGC review';
+ $('language').value=s.language||'English';$('location').value=s.location||'Modern café';$('sceneCount').value=String(s.scenes||3);$('sellingPoints').value=s.sellingPoints||''}
+}catch(e){}
+
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))}
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('installBanner').classList.add('show')});
+$('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('installBanner').classList.remove('show')});
+</script>
+</body>
+</html>
