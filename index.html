@@ -89,6 +89,19 @@
       transition:.2s ease;z-index:20;box-shadow:var(--shadow)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .footer{color:var(--muted);text-align:center;font-size:12px;padding:26px 0 10px}
+
+    .hero-promise{
+      display:inline-flex;align-items:center;margin-top:18px;padding:9px 12px;
+      border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);
+      color:#c7d0dd;font-size:12px;font-weight:650
+    }
+    @media(max-width:800px){
+      input[type="text"],textarea,select{font-size:16px}
+      button{min-height:48px}
+      .copy{min-height:40px}
+      .hero-promise{border-radius:14px;line-height:1.35}
+    }
+
     @media(max-width:800px){
       .app{padding:16px}.grid,.form-grid{grid-template-columns:1fr}.hero{padding:24px}.topbar{align-items:flex-start}
       .hero h2{font-size:clamp(34px,8vw,52px)}
@@ -106,38 +119,39 @@
         <div class="logo">UGC</div>
         <div><h1>AI UGC Studio</h1><p>Affiliate campaign builder</p></div>
       </div>
-      <div class="badge">iPad Build · v0.3</div>
+      <div class="badge">Launch Build · v1.0.1</div>
     </div>
 
     <section class="hero">
-      <h2>Turn one character and one product into an affiliate-ready campaign.</h2>
-      <p>Upload your references, choose campaign settings, and generate structured prompts for images, videos, hooks, captions, and calls to action.</p>
+      <h2>Turn one creator and one product into an affiliate-ready campaign.</h2>
+      <p>Upload your creator and product, choose a few settings, and build a complete affiliate campaign in under 60 seconds.</p>
+      <div class="hero-promise">No prompt engineering required · Works with your preferred AI tools</div>
     </section>
 
     <div class="grid">
       <section class="card">
-        <h3>1. Character Reference</h3>
+        <h3>1. Creator</h3>
         <div class="sub">Used only to preserve identity and visual consistency.</div>
         <div class="upload" id="characterDrop">
           <div class="placeholder"><strong>Tap to upload character</strong>JPG, PNG, or WebP</div>
-          <span class="image-status" id="characterStatus">Optimized preview ready</span>
+          <span class="image-status" id="characterStatus">Ready</span>
           <input id="characterInput" type="file" accept="image/*" />
         </div>
       </section>
 
       <section class="card">
-        <h3>2. Product Reference</h3>
+        <h3>2. Product</h3>
         <div class="sub">The outfit, bag, shoes, skincare, or product to promote.</div>
         <div class="upload" id="productDrop">
           <div class="placeholder"><strong>Tap to upload product</strong>Use a clear product image</div>
-          <span class="image-status" id="productStatus">Optimized preview ready</span>
+          <span class="image-status" id="productStatus">Ready</span>
           <input id="productInput" type="file" accept="image/*" />
         </div>
       </section>
     </div>
 
     <section class="card" style="margin-top:18px">
-      <h3>3. Campaign Settings</h3>
+      <h3>3. Campaign</h3>
       <div class="sub">Choose how the campaign should look and feel.</div>
       <div class="form-grid">
         <div><label>Product name</label><input id="productName" type="text" placeholder="Example: Dusty pink satin abaya" /></div>
@@ -148,16 +162,16 @@
         <div><label>Number of scenes</label><select id="sceneCount"><option value="3">3 scenes</option><option value="5">5 scenes</option></select></div>
       </div>
       <div style="margin-top:14px"><label>Key selling points</label><textarea id="sellingPoints" placeholder="Example: soft fabric, flattering fit, comfortable for all-day wear"></textarea></div>
-      <div class="progress" id="progress"><div class="spinner"></div><span>Building your campaign…</span></div>
+      <div class="progress" id="progress"><div class="spinner"></div><span>Building campaign…</span></div>
       <div class="actions">
-        <button class="primary" id="generateBtn">Generate Campaign</button>
+        <button class="primary" id="generateBtn">Build Campaign</button>
         <button class="secondary" id="exportBtn">Export TXT</button>
         <button class="ghost" id="resetBtn">Reset</button>
       </div>
     </section>
 
     <section class="output" id="output"></section>
-    <div class="footer">AI UGC Studio · Local-first PWA test build</div>
+    <div class="footer">AI UGC Studio · Version 1.0.1 Launch Edition</div>
   </div>
   <div id="toast" class="toast">Copied</div>
 
@@ -192,7 +206,7 @@ function setupUpload(inputId,dropId,statusId,stateKey){
       const dataUrl=await optimizeImage(file);
       drop.querySelectorAll('img').forEach(i=>i.remove());
       const img=document.createElement('img');img.src=dataUrl;img.alt='Uploaded preview';drop.appendChild(img);
-      status.textContent='Optimized preview ready';
+      status.textContent='Ready';
       state[stateKey]=true
     }catch(e){
       status.textContent='Could not process image';state[stateKey]=false
@@ -264,20 +278,20 @@ function outputCard(title,text,open=false){
 
 async function generateCampaign(){
  const btn=$('generateBtn'),progress=$('progress');btn.disabled=true;progress.classList.add('show');
- await new Promise(r=>setTimeout(r,180));
+ await new Promise(requestAnimationFrame);
  const d=getData(),scenes=sceneBlueprints.slice(0,d.scenes),product=productLabel(d);
  const hook=`I didn't expect ${product} to look this good in real life—here's what surprised me most.`;
  const caption=`${product}: ${sellingPoints(d)}. Created for ${d.platform} in a ${d.style.toLowerCase()} style.`;
  const cta=`Tap the product link to check the current price and available options.`;
  const hashtags=`#UGC #AffiliateMarketing #ProductReview #TikTokMadeMeBuyIt #ContentCreator`;
- let html=`<div class="card"><h3>Campaign Generated</h3><div class="sub">Open a section, copy it, or export the complete campaign.</div>`;
+ let html=`<div class="card"><h3>Campaign Generated</h3><div class="sub">Your campaign is ready. Open any section to copy or export everything.</div>`;
  html+=outputCard('Identity Lock',identityPrompt(),true)+outputCard('Product Accuracy',productPrompt(d));
  scenes.forEach(scene=>html+=outputCard(scene.title,scenePrompt(d,scene)));
  html+=outputCard('Hook',hook)+outputCard('Caption',caption)+outputCard('Call to Action',cta)+outputCard('Hashtags',hashtags)+`</div>`;
  $('output').innerHTML=html;$('output').classList.add('show');
  document.querySelectorAll('[data-copy]').forEach(copyBtn=>copyBtn.addEventListener('click',async e=>{
    e.preventDefault();e.stopPropagation();
-   await navigator.clipboard.writeText(decodeURIComponent(copyBtn.dataset.copy));showToast('Copied')
+   await navigator.clipboard.writeText(decodeURIComponent(copyBtn.dataset.copy));showToast('Copied — ready to use')
  }));
  localStorage.setItem('ai-ugc-studio-settings',JSON.stringify(d));
  progress.classList.remove('show');btn.disabled=false;
@@ -291,7 +305,7 @@ function exportTxt(){
   return `${title}\n${'='.repeat(title.length)}\n${body}`
  }).join('\n\n');
  const blob=new Blob([text],{type:'text/plain'}),a=document.createElement('a');
- a.href=URL.createObjectURL(blob);a.download='AI-UGC-Studio-Campaign.txt';a.click();
+ a.href=URL.createObjectURL(blob);const safe=(getData().product||'Campaign').replace(/[^a-z0-9-_]+/gi,'-').replace(/^-+|-+$/g,'');a.download=`AI-UGC-Studio-${safe||'Campaign'}.txt`;a.click();
  setTimeout(()=>URL.revokeObjectURL(a.href),1000);showToast('Campaign exported')
 }
 
