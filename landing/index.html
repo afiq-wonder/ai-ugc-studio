@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0d12" />
-  <meta name="description" content="Upload two images and get a complete affiliate campaign in under 60 seconds with AI UGC Studio by WonderLabs." />
+  <meta name="theme-color" content="#090b10" />
+  <meta name="description" content="AI UGC Studio by WonderLabs turns one creator and one product into a complete affiliate campaign in under 60 seconds." />
   <title>AI UGC Studio — Founding Member Edition</title>
   <style>
     :root{
-      --bg:#0b0d12;
-      --panel:#121620;
-      --panel-2:#171c28;
+      --bg:#090b10;
+      --panel:#111520;
+      --panel2:#171c28;
+      --line:#293043;
       --text:#f7f8fb;
-      --muted:#9aa4b2;
-      --line:#252c3a;
-      --accent:#7c5cff;
-      --accent-2:#9b8cff;
+      --muted:#9da7b7;
+      --purple:#7b5cff;
+      --purple2:#9a86ff;
       --cyan:#4fd1c5;
-      --gold:#c7a96b;
-      --gold-soft:#e8d7ae;
-      --green:#35c78a;
-      --radius:22px;
-      --shadow:0 24px 80px rgba(0,0,0,.34);
+      --gold:#d7be86;
+      --gold2:#f0dfb6;
+      --green:#38d39f;
+      --shadow:0 28px 90px rgba(0,0,0,.42);
+      --radius:24px;
     }
 
     *{box-sizing:border-box}
@@ -32,226 +32,209 @@
       color:var(--text);
       font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:
-        radial-gradient(circle at 16% -8%,rgba(124,92,255,.28),transparent 34%),
-        radial-gradient(circle at 96% 12%,rgba(79,209,197,.13),transparent 24%),
+        radial-gradient(circle at 14% -8%,rgba(123,92,255,.28),transparent 35%),
+        radial-gradient(circle at 95% 10%,rgba(79,209,197,.12),transparent 25%),
         var(--bg);
       -webkit-tap-highlight-color:transparent;
     }
 
     a{text-decoration:none;color:inherit}
     button,input,select,textarea{font:inherit}
-    .wrap{max-width:1180px;margin:0 auto;padding:20px}
+    .container{max-width:1180px;margin:0 auto;padding:18px}
 
     .nav{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-      padding:10px 0 24px;
+      display:flex;align-items:center;justify-content:space-between;gap:18px;
+      padding:12px 0 24px;
     }
     .brand{display:flex;align-items:center;gap:12px}
-    .logo{
-      width:46px;height:46px;border-radius:15px;display:grid;place-items:center;
-      font-weight:900;background:linear-gradient(135deg,var(--accent),var(--cyan));
-      box-shadow:0 10px 30px rgba(124,92,255,.34)
+    .brand-mark{
+      width:48px;height:48px;border-radius:15px;display:grid;place-items:center;
+      font-weight:900;background:linear-gradient(135deg,var(--purple),var(--cyan));
+      box-shadow:0 14px 34px rgba(123,92,255,.32)
     }
-    .brand h1{font-size:18px;margin:0}
-    .brand p{margin:3px 0 0;color:var(--muted);font-size:12px}
+    .brand-copy strong{display:block;font-size:18px}
+    .brand-copy span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
     .nav-actions{display:flex;gap:10px}
 
     .btn{
       display:inline-flex;align-items:center;justify-content:center;
-      min-height:48px;padding:12px 18px;border-radius:13px;
-      border:1px solid var(--line);font-weight:800;transition:.18s ease;
-      cursor:pointer;
+      min-height:48px;padding:12px 18px;border-radius:14px;
+      font-weight:850;border:1px solid var(--line);cursor:pointer;
+      transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
     }
     .btn:hover{transform:translateY(-1px)}
     .btn.primary{
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      border:0;color:white;box-shadow:0 12px 28px rgba(124,92,255,.24)
+      border:0;color:#fff;background:linear-gradient(135deg,var(--purple),var(--purple2));
+      box-shadow:0 14px 34px rgba(123,92,255,.24)
     }
-    .btn.secondary{background:rgba(255,255,255,.03);color:var(--text)}
+    .btn.secondary{background:rgba(255,255,255,.035)}
+    .btn.gold{
+      border:1px solid rgba(215,190,134,.4);
+      color:#16120c;background:linear-gradient(135deg,var(--gold2),var(--gold));
+      box-shadow:0 14px 34px rgba(215,190,134,.16)
+    }
 
     .hero{
-      padding:54px 42px;border:1px solid var(--line);border-radius:30px;
-      background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.018));
-      box-shadow:var(--shadow);
+      border:1px solid var(--line);border-radius:32px;padding:58px 44px;
+      background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.016));
+      box-shadow:var(--shadow);position:relative;overflow:hidden
+    }
+    .hero::after{
+      content:"";position:absolute;right:-110px;top:-110px;width:320px;height:320px;border-radius:50%;
+      background:radial-gradient(circle,rgba(79,209,197,.15),transparent 64%);pointer-events:none
     }
     .eyebrow{
-      display:inline-flex;padding:8px 11px;border-radius:999px;
-      border:1px solid var(--line);background:rgba(255,255,255,.035);
-      color:#c8d0dc;font-size:12px;font-weight:800;margin-bottom:18px;
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.035);font-size:12px;font-weight:800;color:#d5dbe5
     }
-    .hero h2{
-      font-size:clamp(42px,7vw,78px);line-height:.98;letter-spacing:-.045em;
-      margin:0;max-width:920px;
+    .hero h1{
+      max-width:960px;margin:22px 0 0;font-size:clamp(46px,7vw,82px);
+      line-height:.98;letter-spacing:-.05em
     }
     .hero p{
-      max-width:760px;color:var(--muted);font-size:18px;line-height:1.65;margin:22px 0 0;
+      max-width:800px;color:var(--muted);font-size:18px;line-height:1.66;margin:22px 0 0
     }
-    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
-    .micro{margin-top:14px;color:var(--muted);font-size:12px}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+    .compat{color:var(--muted);font-size:12px;margin-top:15px}
 
-    .section{padding:70px 0 0}
-    .section h3{font-size:34px;letter-spacing:-.03em;margin:0 0 12px}
-    .section-intro{color:var(--muted);max-width:760px;line-height:1.6;margin-bottom:24px}
+    .section{padding-top:72px}
+    .section-heading{font-size:36px;letter-spacing:-.035em;margin:0 0 12px}
+    .section-copy{max-width:760px;color:var(--muted);line-height:1.65;margin:0 0 26px}
 
-    .steps,.included{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .three-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
     .card{
-      border:1px solid var(--line);border-radius:var(--radius);padding:22px;
-      background:rgba(18,22,32,.92);box-shadow:0 12px 34px rgba(0,0,0,.16)
+      border:1px solid var(--line);border-radius:var(--radius);padding:24px;
+      background:rgba(17,21,32,.92);box-shadow:0 16px 40px rgba(0,0,0,.18)
     }
-    .step-num{
-      width:34px;height:34px;border-radius:11px;display:grid;place-items:center;
-      background:#1f2540;color:#cfc7ff;font-weight:900;margin-bottom:18px
+    .step{
+      width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+      background:#202640;color:#d3cbff;font-weight:900;margin-bottom:18px
     }
-    .card h4{font-size:18px;margin:0 0 8px}
-    .card p{margin:0;color:var(--muted);line-height:1.55}
+    .card h3{font-size:19px;margin:0 0 9px}
+    .card p{color:var(--muted);line-height:1.58;margin:0}
 
-    .product-section{
-      display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:stretch;
-    }
-
-    .product-demo{
-      border:1px solid var(--line);border-radius:28px;padding:26px;
+    .product-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+    .demo{
+      border:1px solid var(--line);border-radius:30px;padding:28px;
       background:
-        radial-gradient(circle at 85% 12%,rgba(79,209,197,.10),transparent 24%),
-        radial-gradient(circle at 15% 8%,rgba(124,92,255,.18),transparent 28%),
-        linear-gradient(145deg,#171c28,#0f131b);
-      box-shadow:var(--shadow);
+        radial-gradient(circle at 15% 5%,rgba(123,92,255,.18),transparent 30%),
+        radial-gradient(circle at 90% 10%,rgba(79,209,197,.10),transparent 26%),
+        linear-gradient(145deg,#171c28,#0d1118);
+      box-shadow:var(--shadow)
     }
-
-    .demo-top{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px
-    }
-    .demo-badge{
+    .demo-bar{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .pill{
       display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border-radius:999px;
-      border:1px solid var(--line);background:rgba(255,255,255,.04);
-      color:#d7dce5;font-size:12px;font-weight:800
+      border:1px solid var(--line);background:rgba(255,255,255,.035);
+      color:#d6dce5;font-size:12px;font-weight:800
     }
-    .speed{
-      color:var(--muted);font-size:12px;border:1px solid var(--line);
-      padding:7px 10px;border-radius:999px
-    }
-    .product-demo h3{
-      font-size:clamp(30px,4vw,46px);line-height:1.06;letter-spacing:-.035em;
-      margin:0;max-width:760px
-    }
-    .product-demo .lead{
-      color:var(--muted);line-height:1.65;margin:14px 0 24px;max-width:760px
-    }
+    .demo h2{font-size:clamp(32px,4vw,48px);line-height:1.06;letter-spacing:-.04em;margin:24px 0 10px}
+    .demo .lead{color:var(--muted);line-height:1.62;margin:0 0 22px}
 
     .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .upload-box{
-      min-height:180px;border:1px dashed #3a4356;border-radius:18px;
-      background:#0e1219;display:flex;flex-direction:column;align-items:center;
-      justify-content:center;text-align:center;padding:18px
+    .upload{
+      min-height:190px;border:1px dashed #3a4356;border-radius:19px;background:#0c1017;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px
     }
     .upload-icon{
-      width:48px;height:48px;border-radius:15px;display:grid;place-items:center;
-      background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(79,209,197,.12));
-      border:1px solid var(--line);font-size:24px;margin-bottom:12px
+      width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:24px;
+      background:linear-gradient(135deg,rgba(123,92,255,.18),rgba(79,209,197,.12));
+      border:1px solid var(--line);margin-bottom:12px
     }
-    .upload-box strong{font-size:16px}
-    .upload-box span{color:var(--muted);font-size:13px;margin-top:6px}
+    .upload strong{font-size:16px}
+    .upload span{font-size:13px;color:var(--muted);margin-top:6px}
 
-    .output-panel{
-      margin-top:16px;border:1px solid var(--line);border-radius:18px;
-      background:rgba(255,255,255,.025);padding:18px
+    .outputs{
+      margin-top:16px;border:1px solid var(--line);border-radius:19px;padding:18px;
+      background:rgba(255,255,255,.025)
     }
-    .output-panel h4{margin:0 0 14px;font-size:16px}
+    .outputs h3{margin:0 0 13px;font-size:16px}
     .output-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .output-chip{
-      border:1px solid var(--line);border-radius:12px;padding:11px 12px;
-      background:#111722;color:#dce2ea;font-size:13px;font-weight:700
+    .output{
+      border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#111722;
+      color:#dce2eb;font-size:13px;font-weight:750
     }
-    .output-chip::before{content:"✓";color:var(--green);margin-right:7px}
+    .output::before{content:"✓";color:var(--green);margin-right:7px}
+    .demo .btn{width:100%;margin-top:18px}
 
-    .demo-cta{width:100%;margin-top:18px}
-
-    .founding-card{
+    .founding{
       display:flex;flex-direction:column;justify-content:space-between;
       background:
-        linear-gradient(180deg,rgba(199,169,107,.12),rgba(18,22,32,.96)),
+        linear-gradient(180deg,rgba(215,190,134,.14),rgba(17,21,32,.96)),
         var(--panel);
       position:relative;overflow:hidden
     }
-    .founding-card::before{
+    .founding::after{
       content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.07)
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08)
     }
-    .membership-label{color:var(--gold-soft);font-size:12px;font-weight:900;letter-spacing:.12em}
-    .price-row{display:flex;align-items:flex-end;gap:10px;margin:10px 0 4px}
-    .price-row strong{font-size:62px;line-height:.95;letter-spacing:-.06em}
-    .price-row span{color:var(--muted);font-size:13px;padding-bottom:7px}
-    .cohort-note{
-      display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;
-      border:1px solid rgba(199,169,107,.32);background:rgba(199,169,107,.08);
-      color:var(--gold-soft);font-size:12px;font-weight:800;margin:14px 0 20px
+    .label{color:var(--gold2);font-size:12px;font-weight:900;letter-spacing:.12em}
+    .price{display:flex;align-items:flex-end;gap:10px;margin:11px 0 5px}
+    .price strong{font-size:64px;line-height:.95;letter-spacing:-.06em}
+    .price span{font-size:13px;color:var(--muted);padding-bottom:7px}
+    .cohort{
+      display:inline-flex;padding:8px 11px;border-radius:999px;margin:15px 0 20px;
+      border:1px solid rgba(215,190,134,.34);background:rgba(215,190,134,.08);
+      color:var(--gold2);font-size:12px;font-weight:800
     }
     .benefits{list-style:none;padding:0;margin:0;display:grid;gap:12px}
-    .benefits li{color:#dce2ea;line-height:1.45;padding-left:24px;position:relative}
-    .benefits li::before{
-      content:"✓";position:absolute;left:0;top:0;color:var(--green);font-weight:900
-    }
-    .founding-card .btn{width:100%;margin-top:22px}
-    .fineprint{color:var(--muted);font-size:11px;line-height:1.5;margin-top:12px;text-align:center}
+    .benefits li{position:relative;padding-left:24px;color:#dce2ea;line-height:1.45}
+    .benefits li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:900}
+    .founding .btn{width:100%;margin-top:22px}
+    .fineprint{text-align:center;color:var(--muted);font-size:11px;line-height:1.5;margin-top:12px}
 
-    .trust-strip{
-      display:flex;gap:10px;flex-wrap:wrap;margin-top:18px
-    }
-    .trust-chip{
-      border:1px solid var(--line);border-radius:999px;padding:8px 10px;
-      background:rgba(255,255,255,.03);color:#cfd6df;font-size:12px;font-weight:700
+    .trust-list{display:flex;flex-wrap:wrap;gap:10px}
+    .trust{
+      padding:8px 11px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.03);color:#cfd6df;font-size:12px;font-weight:750
     }
 
     .faq{display:grid;gap:12px}
     details{
-      border:1px solid var(--line);border-radius:16px;background:rgba(18,22,32,.9);
-      padding:16px 18px
+      border:1px solid var(--line);border-radius:17px;padding:17px 19px;background:rgba(17,21,32,.9)
     }
-    summary{cursor:pointer;font-weight:800}
-    details p{color:var(--muted);line-height:1.55;margin-bottom:0}
+    summary{cursor:pointer;font-weight:850}
+    details p{color:var(--muted);line-height:1.6;margin-bottom:0}
 
     .final{
-      margin:70px 0 24px;padding:42px;border-radius:28px;border:1px solid var(--line);
-      background:linear-gradient(135deg,rgba(124,92,255,.17),rgba(79,209,197,.08));
-      text-align:center
+      margin:72px 0 24px;padding:44px;border-radius:30px;border:1px solid var(--line);
+      text-align:center;background:linear-gradient(135deg,rgba(123,92,255,.17),rgba(79,209,197,.08))
     }
-    .final h3{font-size:40px;letter-spacing:-.04em;margin:0}
-    .final p{color:var(--muted);margin:14px auto 24px;max-width:640px;line-height:1.6}
-    footer{padding:20px 0 8px;color:var(--muted);font-size:12px;text-align:center}
+    .final h2{font-size:42px;letter-spacing:-.045em;margin:0}
+    .final p{max-width:660px;color:var(--muted);line-height:1.62;margin:14px auto 24px}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 0 6px}
 
-    @media(max-width:900px){
-      .steps,.included{grid-template-columns:1fr}
-      .product-section{grid-template-columns:1fr}
+    @media(max-width:920px){
+      .three-grid,.product-grid{grid-template-columns:1fr}
     }
-
     @media(max-width:700px){
-      .wrap{padding:14px}
+      .container{padding:14px}
       .nav{align-items:flex-start}
-      .nav-actions{flex-direction:column;width:148px}
-      .nav-actions .btn{min-height:42px;padding:9px 12px;font-size:13px}
-      .hero{padding:34px 22px}
-      .hero h2{font-size:48px}
+      .nav-actions{flex-direction:column;width:150px}
+      .nav-actions .btn{min-height:42px;padding:9px 11px;font-size:13px}
+      .hero{padding:36px 22px}
+      .hero h1{font-size:49px}
       .hero p{font-size:16px}
       .hero-actions .btn{width:100%}
-      .section{padding-top:48px}
-      .product-demo,.founding-card{padding:20px}
+      .section{padding-top:50px}
+      .demo,.founding{padding:20px}
       .upload-grid,.output-grid{grid-template-columns:1fr}
-      .upload-box{min-height:145px}
-      .demo-top{align-items:flex-start}
-      .price-row strong{font-size:54px}
-      .final{padding:30px 20px}
-      .final h3{font-size:34px}
+      .upload{min-height:150px}
+      .price strong{font-size:56px}
+      .final{padding:32px 20px}
+      .final h2{font-size:35px}
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
+  <main class="container">
     <nav class="nav">
       <div class="brand">
-        <div class="logo">W</div>
-        <div>
-          <h1>WonderLabs</h1>
-          <p>Building practical AI tools for creators</p>
+        <div class="brand-mark">W</div>
+        <div class="brand-copy">
+          <strong>WonderLabs</strong>
+          <span>Building practical AI tools for creators</span>
         </div>
       </div>
       <div class="nav-actions">
@@ -261,88 +244,86 @@
     </nav>
 
     <section class="hero">
-      <div class="eyebrow">AI UGC Studio · Founding Member Edition</div>
-      <h2>Never wonder what to post again.</h2>
-      <p>Upload one creator. Upload one product. Receive a complete affiliate campaign in under 60 seconds—without prompt engineering or staring at a blank page.</p>
+      <span class="eyebrow">AI UGC Studio · Founding Member Edition</span>
+      <h1>Never wonder what to post again.</h1>
+      <p>Upload one creator and one product. Receive a complete affiliate campaign in under 60 seconds—without prompt engineering, blank-page stress, or endless guessing.</p>
       <div class="hero-actions">
         <a class="btn primary" href="https://afiq-wonder.github.io/ai-ugc-studio/" target="_blank" rel="noopener">Try the Live Demo</a>
         <a class="btn secondary" href="https://payhip.com/b/iEX1t" target="_blank" rel="noopener">Become a Founding Member</a>
       </div>
-      <div class="micro">Works with ChatGPT, Claude, Gemini, Flux, Leonardo AI, Kling, Veo, Runway, and more.</div>
+      <div class="compat">Works with ChatGPT, Claude, Gemini, Flux, Leonardo AI, Kling, Veo, Runway, and more.</div>
     </section>
 
     <section class="section">
-      <h3>How it works</h3>
-      <p class="section-intro">A simple workflow designed to remove decision fatigue and help creators move from product idea to usable campaign faster.</p>
-      <div class="steps">
+      <h2 class="section-heading">How it works</h2>
+      <p class="section-copy">One focused workflow that turns references into campaign direction fast.</p>
+      <div class="three-grid">
         <article class="card">
-          <div class="step-num">1</div>
-          <h4>Upload your creator</h4>
-          <p>Add the creator image you want to keep visually consistent throughout the campaign.</p>
+          <div class="step">1</div>
+          <h3>Upload your creator</h3>
+          <p>Add the creator image you want to preserve across every generated scene.</p>
         </article>
         <article class="card">
-          <div class="step-num">2</div>
-          <h4>Upload your product</h4>
-          <p>Add the outfit, bag, skincare, gadget, home item, or product you want to promote.</p>
+          <div class="step">2</div>
+          <h3>Upload your product</h3>
+          <p>Add the outfit, skincare, gadget, home item, food product, or offer you want to promote.</p>
         </article>
         <article class="card">
-          <div class="step-num">3</div>
-          <h4>Build your campaign</h4>
-          <p>Receive structured prompts, hooks, scenes, caption, CTA, hashtags, and campaign guidance.</p>
+          <div class="step">3</div>
+          <h3>Build your campaign</h3>
+          <p>Receive identity guidance, product guidance, scenes, hook, caption, CTA, hashtags, and export-ready prompts.</p>
         </article>
       </div>
     </section>
 
-    <section class="section product-section">
-      <div class="product-demo">
-        <div class="demo-top">
-          <span class="demo-badge">✨ Try AI UGC Studio</span>
-          <span class="speed">Under 60 seconds</span>
+    <section class="section product-grid">
+      <div class="demo">
+        <div class="demo-bar">
+          <span class="pill">✨ Product Preview</span>
+          <span class="pill">Under 60 seconds</span>
         </div>
-
-        <h3>Upload two images. Get a complete affiliate campaign.</h3>
-        <p class="lead">See exactly what AI UGC Studio prepares for you before you buy.</p>
+        <h2>Upload two images. Get a complete affiliate campaign.</h2>
+        <p class="lead">See what AI UGC Studio prepares before you become a member.</p>
 
         <div class="upload-grid">
-          <div class="upload-box">
+          <div class="upload">
             <div class="upload-icon">📷</div>
-            <strong>Creator Photo</strong>
-            <span>Your identity reference</span>
+            <strong>Creator Reference</strong>
+            <span>Identity and visual consistency</span>
           </div>
-          <div class="upload-box">
+          <div class="upload">
             <div class="upload-icon">📦</div>
-            <strong>Product Photo</strong>
-            <span>The item you want to promote</span>
+            <strong>Product Reference</strong>
+            <span>Product shape, colour, material, and details</span>
           </div>
         </div>
 
-        <div class="output-panel">
-          <h4>Your campaign includes</h4>
+        <div class="outputs">
+          <h3>Your campaign includes</h3>
           <div class="output-grid">
-            <div class="output-chip">Identity Lock</div>
-            <div class="output-chip">Product Accuracy</div>
-            <div class="output-chip">Video Hook</div>
-            <div class="output-chip">Scene 1</div>
-            <div class="output-chip">Scene 2</div>
-            <div class="output-chip">Scene 3</div>
-            <div class="output-chip">Caption</div>
-            <div class="output-chip">CTA</div>
-            <div class="output-chip">Hashtags</div>
+            <div class="output">Identity Lock</div>
+            <div class="output">Product Accuracy</div>
+            <div class="output">Video Hook</div>
+            <div class="output">Scene 1</div>
+            <div class="output">Scene 2</div>
+            <div class="output">Scene 3</div>
+            <div class="output">Caption</div>
+            <div class="output">CTA</div>
+            <div class="output">Hashtags</div>
           </div>
         </div>
 
-        <a class="btn primary demo-cta" href="https://afiq-wonder.github.io/ai-ugc-studio/" target="_blank" rel="noopener">Generate a Demo Campaign</a>
+        <a class="btn primary" href="https://afiq-wonder.github.io/ai-ugc-studio/" target="_blank" rel="noopener">Generate a Demo Campaign</a>
       </div>
 
-      <aside class="card founding-card">
+      <aside class="card founding">
         <div>
-          <div class="membership-label">WONDERLABS FOUNDING COHORT</div>
-          <div class="price-row">
+          <div class="label">WONDERLABS FOUNDING COHORT</div>
+          <div class="price">
             <strong>RM79</strong>
             <span>one-time payment</span>
           </div>
-          <div class="cohort-note">100 founding memberships only</div>
-
+          <div class="cohort">First 100 members only</div>
           <ul class="benefits">
             <li>Lifetime AI UGC Studio updates</li>
             <li>Early access to future WonderLabs products</li>
@@ -353,61 +334,60 @@
             <li>Permanent Founding Member badge</li>
           </ul>
         </div>
-
         <div>
-          <a class="btn primary" href="https://payhip.com/b/iEX1t" target="_blank" rel="noopener">Become a Founding Member</a>
-          <div class="fineprint">Lifetime launch pricing for the first 100 members. No subscription.</div>
+          <a class="btn gold" href="https://payhip.com/b/iEX1t" target="_blank" rel="noopener">Become a Founding Member</a>
+          <div class="fineprint">Lifetime launch pricing. No subscription.</div>
         </div>
       </aside>
     </section>
 
     <section class="section">
-      <h3>Built for your existing AI workflow</h3>
-      <p class="section-intro">Generate once, then use the campaign with the AI tools you already prefer.</p>
-      <div class="trust-strip">
-        <span class="trust-chip">ChatGPT</span>
-        <span class="trust-chip">Claude</span>
-        <span class="trust-chip">Gemini</span>
-        <span class="trust-chip">Flux</span>
-        <span class="trust-chip">Leonardo AI</span>
-        <span class="trust-chip">Kling</span>
-        <span class="trust-chip">Veo</span>
-        <span class="trust-chip">Runway</span>
+      <h2 class="section-heading">Works with any AI</h2>
+      <p class="section-copy">Generate once, then use your campaign with the AI tools already in your workflow.</p>
+      <div class="trust-list">
+        <span class="trust">ChatGPT</span>
+        <span class="trust">Claude</span>
+        <span class="trust">Gemini</span>
+        <span class="trust">Flux</span>
+        <span class="trust">Leonardo AI</span>
+        <span class="trust">Kling</span>
+        <span class="trust">Veo</span>
+        <span class="trust">Runway</span>
       </div>
     </section>
 
     <section class="section">
-      <h3>What you receive</h3>
-      <p class="section-intro">Everything needed to move from product reference to content direction without starting from zero.</p>
-      <div class="included">
+      <h2 class="section-heading">What you receive</h2>
+      <p class="section-copy">Everything required to move from two references to a usable content direction.</p>
+      <div class="three-grid">
         <article class="card">
-          <h4>Campaign structure</h4>
-          <p>A clear hook, demonstration flow, result, CTA, and scene sequence.</p>
+          <h3>Campaign structure</h3>
+          <p>A clear hook, demonstration, result, scene flow, and call to action.</p>
         </article>
         <article class="card">
-          <h4>AI-ready prompts</h4>
-          <p>Structured prompts that preserve creator identity and product accuracy.</p>
+          <h3>AI-ready prompts</h3>
+          <p>Structured prompts built around creator consistency and product accuracy.</p>
         </article>
         <article class="card">
-          <h4>Copy and export</h4>
-          <p>Copy individual outputs or export the complete campaign as a TXT file.</p>
+          <h3>Copy and export</h3>
+          <p>Copy individual sections or export the complete campaign as a TXT file.</p>
         </article>
       </div>
     </section>
 
     <section class="section">
-      <h3>Frequently asked questions</h3>
+      <h2 class="section-heading">Frequently asked questions</h2>
       <div class="faq">
         <details>
           <summary>Do I need prompt engineering experience?</summary>
-          <p>No. AI UGC Studio creates the structured campaign prompts for you.</p>
+          <p>No. AI UGC Studio creates the campaign structure and ready-to-use prompts for you.</p>
         </details>
         <details>
           <summary>Does it generate the final image or video?</summary>
-          <p>AI UGC Studio builds the campaign, scenes, hooks, captions, calls to action, hashtags, and optimized prompts. You then use those outputs with the AI tool you prefer.</p>
+          <p>The current Founding Member Edition generates the full campaign plan and optimized prompts. You use those prompts with your preferred image or video AI.</p>
         </details>
         <details>
-          <summary>Does it work on mobile?</summary>
+          <summary>Does it work on mobile and tablet?</summary>
           <p>Yes. It is designed for iPhone, iPad, Android phones, Android tablets, and desktop browsers.</p>
         </details>
         <details>
@@ -415,16 +395,16 @@
           <p>No. Founding Member Edition is a one-time purchase.</p>
         </details>
         <details>
-          <summary>Why are there only 100 Founding Memberships?</summary>
-          <p>The first cohort receives permanent founding benefits and helps shape AI UGC Studio through early feedback and beta access.</p>
+          <summary>Why only 100 Founding Members?</summary>
+          <p>The first cohort receives permanent founding benefits and directly helps shape AI UGC Studio through feedback, beta access, and roadmap participation.</p>
         </details>
       </div>
     </section>
 
     <section class="final">
-      <h3>Stop thinking. Start creating.</h3>
+      <h2>Stop thinking. Start creating.</h2>
       <p>Join the first 100 WonderLabs members and turn two images into your next affiliate campaign in under 60 seconds.</p>
-      <a class="btn primary" href="https://payhip.com/b/iEX1t" target="_blank" rel="noopener">Join the WonderLabs Founding Cohort</a>
+      <a class="btn gold" href="https://payhip.com/b/iEX1t" target="_blank" rel="noopener">Join the WonderLabs Founding Cohort</a>
     </section>
 
     <footer>Built by WonderLabs · AI UGC Studio is the first product in the WonderLabs ecosystem.</footer>
