@@ -1,7 +1,7 @@
 (function (global) {
   'use strict';
 
-  const DEFAULT_MODEL = 'gemini-2.5-flash-lite';
+  const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
   const DIRECT_ENDPOINT = model => `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
   function dataUrlToInlineData(dataUrl) {
@@ -216,8 +216,6 @@
         try {
           directed = await this.analyzeDiscovery({ context, profiles });
         } catch (searchError) {
-          // Search grounding can be quota- or availability-limited. Retry once
-          // without Search so the Director still benefits from visual profiles.
           if (mode === 'direct-test' && config.useSearchGrounding !== false) {
             directed = await callGeminiDirect({
               apiKey: config.apiKey,
@@ -269,7 +267,7 @@
       <div class="sub">Optional. Scans creator + product, builds a Discovery Profile, then directs the campaign. Your key stays in memory for this tab only and is never saved.</div>
       <div class="form-grid">
         <div><label>Gemini API key (session only)</label><input id="geminiApiKey" type="password" autocomplete="off" placeholder="Paste a test key" /></div>
-        <div><label>Intelligence model</label><select id="geminiModel"><option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option><option value="gemini-2.5-flash">Gemini 2.5 Flash</option></select></div>
+        <div><label>Intelligence model</label><select id="geminiModel"><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite</option><option value="gemini-3.5-flash">Gemini 3.5 Flash</option></select></div>
       </div>
       <div style="margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5">Perception → Discovery → Creative. Google Search grounding is used when available; if grounding hits a quota or availability error, the Director retries without grounding. Production must move this behind the WonderLabs backend boundary.</div>
       <div class="actions" style="position:static;background:none;border:0;padding:0;margin-top:14px">
