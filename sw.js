@@ -1,5 +1,5 @@
-const CACHE_NAME = "ai-ugc-studio-v1.0.1";
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png"];
+const CACHE_NAME = "ai-ugc-studio-v1.0.4";
+const ASSETS = ["./", "./index.html", "./ai-provider-adapter.js", "./gemini-provider.js", "./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
