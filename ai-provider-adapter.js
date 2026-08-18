@@ -15,7 +15,7 @@
   }
 
   const adapter = {
-    version: '0.3.0',
+    version: '0.4.0',
 
     registerProvider(candidate) {
       assertProvider(candidate);
@@ -64,12 +64,18 @@
   Object.freeze(adapter);
   global.AIProviderAdapter = adapter;
 
-  // Provider modules load independently so AI UGC Studio still works if a
-  // provider script is missing, offline, or disabled. No provider is active
-  // until explicitly registered.
-  const geminiScript = document.createElement('script');
-  geminiScript.src = './gemini-provider.js';
-  geminiScript.async = true;
-  geminiScript.onerror = () => console.warn('Gemini provider module unavailable; local mode remains active.');
-  document.head.appendChild(geminiScript);
+  function loadScript(src, onload) {
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = onload || null;
+    script.onerror = () => console.warn(`${src} unavailable; local mode remains active.`);
+    document.head.appendChild(script);
+  }
+
+  // Provider modules remain independent so the core product keeps working
+  // when a provider is missing, disabled, out of quota, or temporarily down.
+  loadScript('./gemini-provider.js', function () {
+    loadScript('./ai-intelligence-integration.js');
+  });
 })(window);
