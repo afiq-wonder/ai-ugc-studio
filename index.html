@@ -175,6 +175,7 @@
   </div>
   <div id="toast" class="toast">Copied</div>
 
+<script src="./ai-provider-adapter.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const state={characterReady:false,productReady:false};
@@ -280,13 +281,40 @@ async function generateCampaign(){
  const btn=$('generateBtn'),progress=$('progress');btn.disabled=true;progress.classList.add('show');
  await new Promise(requestAnimationFrame);
  const d=getData(),scenes=sceneBlueprints.slice(0,d.scenes),product=productLabel(d);
- const hook=`I didn't expect ${product} to look this good in real life—here's what surprised me most.`;
- const caption=`${product}: ${sellingPoints(d)}. Created for ${d.platform} in a ${d.style.toLowerCase()} style.`;
- const cta=`Tap the product link to check the current price and available options.`;
- const hashtags=`#UGC #AffiliateMarketing #ProductReview #TikTokMadeMeBuyIt #ContentCreator`;
+ const localCampaign={
+   identity:identityPrompt(),
+   productAccuracy:productPrompt(d),
+   scenes:scenes.map(scene=>({title:scene.title,text:scenePrompt(d,scene)})),
+   hook:`I didn't expect ${product} to look this good in real life—here's what surprised me most.`,
+   caption:`${product}: ${sellingPoints(d)}. Created for ${d.platform} in a ${d.style.toLowerCase()} style.`,
+   cta:`Tap the product link to check the current price and available options.`,
+   hashtags:`#UGC #AffiliateMarketing #ProductReview #TikTokMadeMeBuyIt #ContentCreator`
+ };
+ let campaign=localCampaign;
+ try{
+   const enhanced=await window.AIProviderAdapter?.enhanceCampaign?.({
+     input:d,
+     references:{
+       character:$('characterDrop').querySelector('img')?.src||null,
+       product:$('productDrop').querySelector('img')?.src||null
+     },
+     campaign:localCampaign
+   });
+   if(enhanced&&typeof enhanced==='object'){
+     campaign={...localCampaign,...enhanced};
+     if(!Array.isArray(campaign.scenes))campaign.scenes=localCampaign.scenes;
+   }
+ }catch(error){
+   console.warn('AI provider unavailable; using local campaign generator.',error);
+   campaign=localCampaign;
+ }
+ const hook=campaign.hook||localCampaign.hook;
+ const caption=campaign.caption||localCampaign.caption;
+ const cta=campaign.cta||localCampaign.cta;
+ const hashtags=campaign.hashtags||localCampaign.hashtags;
  let html=`<div class="card"><h3>Campaign Generated</h3><div class="sub">Your campaign is ready. Open any section to copy or export everything.</div>`;
- html+=outputCard('Identity Lock',identityPrompt(),true)+outputCard('Product Accuracy',productPrompt(d));
- scenes.forEach(scene=>html+=outputCard(scene.title,scenePrompt(d,scene)));
+ html+=outputCard('Identity Lock',campaign.identity||localCampaign.identity,true)+outputCard('Product Accuracy',campaign.productAccuracy||localCampaign.productAccuracy);
+ campaign.scenes.forEach((scene,index)=>html+=outputCard(scene.title||localCampaign.scenes[index]?.title||`Scene ${index+1}`,scene.text||localCampaign.scenes[index]?.text||''));
  html+=outputCard('Hook',hook)+outputCard('Caption',caption)+outputCard('Call to Action',cta)+outputCard('Hashtags',hashtags)+`</div>`;
  $('output').innerHTML=html;$('output').classList.add('show');
  document.querySelectorAll('[data-copy]').forEach(copyBtn=>copyBtn.addEventListener('click',async e=>{
