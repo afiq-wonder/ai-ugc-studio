@@ -1,6 +1,6 @@
 # AI UGC Studio — Evidence Architecture
 
-Status: LOCKED BASELINE + SPATIAL EXTENSION UNDER VALIDATION
+Status: LOCKED BASELINE + SPATIAL VALIDATED
 Locked: 2026-08-18
 Scope: AI Provider intelligence pipeline
 
@@ -10,7 +10,7 @@ Creative freedom must never outrun factual evidence.
 
 The intelligence pipeline is:
 
-Perception -> Evidence -> Discovery -> Creative
+Perception -> Evidence -> Spatial Evidence -> Discovery -> Creative
 
 ## Evidence contract
 
@@ -63,12 +63,21 @@ Production E2E blank-claims test confirmed:
 - product structure is recognized from the reference image;
 - missing selling points do not break campaign generation.
 
-Spatial regression test identified a remaining failure mode:
-- product structure can remain accurate while real-world product scale drifts during downstream image generation.
-- the spatial extension above exists specifically to prevent that failure mode and must be regression-tested before being locked.
+Spatial regression tests confirmed:
+- printed-dimension references can preserve believable real-world product size;
+- dimension-free multi-product references can preserve useful functional scale relationships;
+- the Scale Lock materially reduces catastrophic miniaturization/enlargement while preserving product detail.
+
+## Rejected experiment — relationship / kit cohesion layer
+
+A stronger Relationship Evidence / Composition Lock experiment was tested against the multi-product content-creator starter-kit case and produced worse proportional fidelity. The experiment was rolled back completely.
+
+Do not reintroduce that implementation into the locked baseline. Future multi-product cohesion work must remain a separate, soft composition experiment and must not contaminate the validated Scale Lock or product geometry evidence.
 
 ## Change control
 
-The factual Evidence Architecture remains locked. Future creative tuning may improve hooks, persuasion, tone and scene direction, but must not weaken the evidence contract above.
+The factual Evidence Architecture and Spatial Evidence / Scale Lock are now locked as the current validated baseline.
 
-The Spatial Evidence / Scale Lock extension is additive and currently under validation. Any change that expands what counts as an advertising fact or weakens scale-source requirements should be treated as an architecture change and revalidated before release.
+Future creative tuning may improve hooks, persuasion, tone, scene direction, or multi-product presentation, but must not weaken the evidence contract, scale-source requirements, or product-fidelity behavior above.
+
+Any future relationship/composition system must be isolated, opt-in during validation, and regression-tested against both single-product and multi-product references before inclusion in the locked baseline.
