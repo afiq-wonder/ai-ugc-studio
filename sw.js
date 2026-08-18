@@ -1,4 +1,4 @@
-const CACHE_NAME = "ai-ugc-studio-v1.0.3";
+const CACHE_NAME = "ai-ugc-studio-v1.0.4";
 const ASSETS = ["./", "./index.html", "./ai-provider-adapter.js", "./gemini-provider.js", "./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
