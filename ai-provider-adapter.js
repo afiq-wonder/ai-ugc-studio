@@ -8,14 +8,14 @@
       throw new TypeError('AI provider must be an object.');
     }
 
-    const supported = ['generateText', 'analyzeImages', 'generateCampaign'];
+    const supported = ['generateText', 'analyzeImages', 'analyzeDiscovery', 'generateCampaign'];
     if (!supported.some(method => typeof candidate[method] === 'function')) {
-      throw new TypeError('AI provider must implement generateText(), analyzeImages(), or generateCampaign().');
+      throw new TypeError('AI provider must implement generateText(), analyzeImages(), analyzeDiscovery(), or generateCampaign().');
     }
   }
 
   const adapter = {
-    version: '0.2.0',
+    version: '0.3.0',
 
     registerProvider(candidate) {
       assertProvider(candidate);
@@ -48,6 +48,11 @@
     async analyzeImages(request) {
       if (!provider || typeof provider.analyzeImages !== 'function') return null;
       return provider.analyzeImages(request);
+    },
+
+    async analyzeDiscovery(request) {
+      if (!provider || typeof provider.analyzeDiscovery !== 'function') return null;
+      return provider.analyzeDiscovery(request);
     },
 
     async enhanceCampaign(context) {
