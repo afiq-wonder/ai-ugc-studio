@@ -36,10 +36,10 @@
 
   function wardrobeLock(context) {
     if (isClothingProduct(context)) {
-      return `Preserve the creator's identity and overall style direction. The promoted clothing becomes the wardrobe anchor for the scene. Reimagine the garment naturally on the creator while preserving the product's visible design, proportions, colorway and recognisable details. Allow realistic drape, folds, stretch, tension and movement so the clothing behaves like real fabric on this creator's body.`;
+      return `Preserve the creator's identity and overall style direction. The promoted clothing becomes the wardrobe anchor for this scene. Reimagine the garment naturally on the creator while preserving the product's visible design, proportions, colorway and recognisable details. Allow realistic drape, folds, stretch, tension and movement so the clothing behaves like real fabric on this creator's body.`;
     }
 
-    return `Preserve the creator's identity and overall style language, but allow the wardrobe to adapt naturally to the scene, location, activity, time of day and campaign progression. The creator may change outfit when that makes the UGC feel more believable, while still reading as the same person with the same established fashion identity. Avoid abrupt or unrelated styling changes that make the creator feel like a different character.`;
+    return `Preserve the creator's identity and overall style language. Wardrobe may adapt naturally to the requirements of this specific scene, including its location, activity and context, while still reading as the same person with the same established fashion identity. Avoid abrupt or unrelated styling changes that make the creator feel like a different character.`;
   }
 
   function locationLock(context) {
@@ -48,11 +48,15 @@
       return `Creator is physically outdoors on a real urban pedestrian street. Visible pavement, road edge, storefront exteriors and surrounding city architecture should establish the environment. Use natural outdoor daylight. The creator must be outside, not inside a shop, home, studio, showroom or interior space. Do not inherit the background from either reference image.`;
     }
 
-    return `The selected campaign location is ${location || 'the requested location'}. Treat it as the actual physical environment of the scene. Establish it with believable environmental cues and matching light. Do not inherit the background from either reference image when it conflicts with the selected campaign location.`;
+    return `The selected campaign location is ${location || 'the requested location'}. Treat it as the actual physical environment of this scene. Establish it with believable environmental cues and matching light. Do not inherit the background from either reference image when it conflicts with the selected campaign location.`;
+  }
+
+  function singleSceneLock() {
+    return `Generate ONE single image for this scene only. Do not create a collage, split-screen, storyboard, contact sheet, multi-panel composition, comparison layout, before-and-after layout, sequence of moments, or multiple scenes in one image. Show one creator, one product setup and one believable environment. Any campaign progression happens across separate generated images, never inside this image.`;
   }
 
   function sceneLogicLock() {
-    return `Build a believable real-world UGC moment using only the creator, the promoted product and the environment needed for the scene. The product interaction must make physical and everyday sense for a normal person. Keep the visual clean and concise. Do not reproduce screenshot UI, reference-image captions, feature callouts, promotional banners, hashtags, collage layouts or unrelated text as visible elements in the generated scene.`;
+    return `Build one believable real-world UGC moment using only the creator, the promoted product and the environment needed for this scene. The product interaction must make physical and everyday sense for a normal person. Keep the visual clean and concise. Do not reproduce screenshot UI, reference-image captions, feature callouts, promotional banners, hashtags, collage layouts or unrelated text as visible elements in the generated scene.`;
   }
 
   function placementLock(context) {
@@ -81,6 +85,7 @@
 
     const wardrobe = wardrobeLock(context);
     const location = locationLock(context);
+    const singleScene = singleSceneLock();
     const sceneLogic = sceneLogicLock();
     const placement = placementLock(context);
 
@@ -88,7 +93,7 @@
     const scenes = Array.isArray(campaign.scenes)
       ? campaign.scenes.map(scene => ({
           ...scene,
-          text: `${scene.text || ''}\n\nLOCATION LOCK\n${location}\n\nSCENE LOGIC LOCK\n${sceneLogic}\n\nPLACEMENT LOGIC LOCK\n${placement}`.trim()
+          text: `${scene.text || ''}\n\nSINGLE SCENE OUTPUT\n${singleScene}\n\nLOCATION LOCK\n${location}\n\nSCENE LOGIC LOCK\n${sceneLogic}\n\nPLACEMENT LOGIC LOCK\n${placement}`.trim()
         }))
       : campaign.scenes;
 
@@ -99,7 +104,7 @@
   }
 
   const adapter = {
-    version: '0.5.0',
+    version: '0.5.1',
 
     registerProvider(candidate) {
       assertProvider(candidate);
