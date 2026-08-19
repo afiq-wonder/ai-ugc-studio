@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI UGC Studio — Local Outdoor Lock Test</title>
+<style>
+body{margin:0;background:#0b0d12;color:#f7f8fb;font-family:Inter,system-ui,-apple-system,sans-serif}.app{max-width:900px;margin:auto;padding:20px}.card{background:#121620;border:1px solid #252c3a;border-radius:18px;padding:18px;margin:14px 0}.muted{color:#9aa4b2;font-size:13px;line-height:1.5}label{display:block;color:#9aa4b2;font-size:12px;margin:12px 0 6px}input,textarea,select{width:100%;box-sizing:border-box;background:#0f131b;color:#fff;border:1px solid #252c3a;border-radius:12px;padding:12px;font:inherit}textarea{min-height:90px}button{border:0;border-radius:12px;padding:12px 16px;background:#7c5cff;color:white;font-weight:700;margin-top:14px}pre{white-space:pre-wrap;background:#0f131b;border:1px solid #252c3a;border-radius:12px;padding:14px;line-height:1.55;font-size:13px}.tag{display:inline-block;border:1px solid #35c78a;color:#35c78a;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:700}.scene{margin-top:12px}.copy{background:#20283a;margin:0 0 8px 0;padding:8px 10px;font-size:12px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="app">
+<div class="card"><span class="tag">LOCAL TEST ONLY</span><h2>Outdoor City Street Lock</h2><div class="muted">This does not change production or Enhanced Intelligence. It tests one hypothesis only: stronger positive visual environment wording for Local Director.</div></div>
+<div class="card">
+<div class="row"><div><label>Product name</label><input id="product" value="Brooklyn oversized shirt" /></div><div><label>Language</label><select id="language"><option>Bahasa Melayu</option><option>English</option></select></div></div>
+<label>Location</label><select id="location"><option>Outdoor city street</option><option>Modern café</option><option>Minimalist living room</option></select>
+<label>Key selling points</label><textarea id="selling">kain sedap, selesa, ringan</textarea>
+<button id="build">Build Local Test Prompt</button>
+</div>
+<div class="card" id="out" style="display:none"><h3>Local Director Output</h3><div class="muted">Use the same creator + product references in Gemini. Copy one scene exactly as generated; do not manually improve it.</div><div id="scenes"></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const outdoor=`ENVIRONMENT LOCK — OUTDOOR CITY STREET:\nCreator standing outdoors on a real urban pedestrian street. Visible pavement, road edge, storefront exteriors and surrounding city architecture behind the creator. Natural outdoor daylight. The creator is physically outside, not inside a shop, home, studio, showroom or interior space.\n\nReference backgrounds are non-authoritative. Do not reproduce the creator-reference room/background or the product-reference display/background. Build a new outdoor urban street environment for this scene.`;
+function env(location){
+ if(location==='Outdoor city street') return outdoor;
+ return `ENVIRONMENT: ${location}. Generate the scene in this selected environment. Do not inherit the original background from either reference image.`;
+}
+const actions=[
+ 'The creator naturally introduces the promoted product with a relaxed first reaction and immediate visual interaction.',
+ 'The creator demonstrates the promoted product naturally, using believable body movement and showing important visible product details.',
+ 'The creator gives a natural final product moment and relaxed recommendation while keeping the product clearly visible.'
+];
+function promptFor(i){
+ const product=$('product').value.trim()||'the promoted product';
+ const location=$('location').value;
+ const language=$('language').value;
+ const selling=$('selling').value.trim();
+ return `SCENE ${i+1} — LOCAL DIRECTOR TEST\n\nCreate a vertical 9:16 authentic UGC campaign image.\nLanguage/context: ${language}.\nProduct: ${product}.\n\nREFERENCE AUTHORITY:\n- First reference image controls creator identity only. Preserve the same recognizable person and realistic body proportions. Do not copy its original background or pose.\n- Second reference image controls product identity only. Preserve visible product design, color, graphics, proportions and defining details. Do not copy its original rack, display, shop composition, screenshot UI or unrelated surrounding elements.\n\n${env(location)}\n\nCREATOR ACTION:\n${actions[i]}\n\nPRODUCT INTERACTION:\nIf the promoted product is clothing, the creator must wear the promoted garment naturally. Preserve the garment's recognizable design while allowing realistic folds, drape, sleeve bend, body turn and fabric movement. If it is not clothing, handle/use/display it naturally according to its obvious product type.\n\n${selling?`Selling points for campaign context only: ${selling}. Do not render this copy as visible text in the image.\n\n`:''}VISUAL OUTPUT ONLY:\nDo not render dialogue, captions, hashtags, prompt instructions, labels, UI text or campaign copy into the image unless that text is physically part of the promoted product reference.\n\nCamera: authentic handheld creator-style framing, natural perspective, believable outdoor lighting, realistic skin and fabric, commercially usable UGC rather than catalogue posing.`;
+}
+$('build').onclick=()=>{
+ $('out').style.display='block';
+ $('scenes').innerHTML='';
+ for(let i=0;i<3;i++){
+   const wrap=document.createElement('div');wrap.className='scene';
+   const b=document.createElement('button');b.className='copy';b.textContent=`Copy Scene ${i+1}`;
+   const p=document.createElement('pre');p.textContent=promptFor(i);
+   b.onclick=async()=>{await navigator.clipboard.writeText(p.textContent);b.textContent='Copied';setTimeout(()=>b.textContent=`Copy Scene ${i+1}`,900)};
+   wrap.append(b,p);$('scenes').appendChild(wrap);
+ }
+ $('out').scrollIntoView({behavior:'smooth'});
+};
+</script></body></html>
