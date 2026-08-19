@@ -45,10 +45,10 @@
   function locationLock(context) {
     const location = String(context?.input?.location || '').trim();
     if (/outdoor city street/i.test(location)) {
-      return `Creator is physically outdoors on a real urban pedestrian street. Visible pavement, road edge, storefront exteriors and surrounding city architecture should establish the environment. Use natural outdoor daylight. The creator must be outside, not inside a shop, home, studio, showroom or interior space. Do not inherit the background from either reference image.`;
+      return `LOCATION AUTHORITY: Outdoor city street is mandatory and overrides every background, room, architecture or environment visible in either reference image. The creator must be physically outdoors on a real urban pedestrian street in this generated image. Show unmistakable exterior evidence such as pavement or sidewalk, road/street edge, storefront exteriors, surrounding city buildings or urban architecture, open-air depth and natural outdoor daylight. Do not place the creator inside or at the visual edge of a home, studio, boutique, showroom, shop, café interior or any other indoor environment. Do not inherit the background from either reference image.`;
     }
 
-    return `The selected campaign location is ${location || 'the requested location'}. Treat it as the actual physical environment of this scene. Establish it with believable environmental cues and matching light. Do not inherit the background from either reference image when it conflicts with the selected campaign location.`;
+    return `LOCATION AUTHORITY: ${location || 'The selected campaign location'} is mandatory and overrides every background or environment visible in either reference image. Treat it as the actual physical environment of this generated image. Establish it with clear, unmistakable environmental anchors and matching light. Do not inherit the creator-reference or product-reference background when it conflicts with the selected campaign location.`;
   }
 
   function singleSceneLock() {
@@ -79,6 +79,18 @@
     return `Choose the most believable real-world relationship between creator and product. Preserve normal product scale and function. The creator may wear, hold, place beside, operate or stand near the product depending on what a real person would naturally do with it. Do not force a generic hand-held pose.`;
   }
 
+  function applyLocationAuthority(context, campaign) {
+    if (!campaign || typeof campaign !== 'object') return campaign;
+    const location = locationLock(context);
+    const scenes = Array.isArray(campaign.scenes)
+      ? campaign.scenes.map(scene => ({
+          ...scene,
+          text: `LOCATION / ENVIRONMENT LOCK\n${location}\n\n${scene.text || ''}`.trim()
+        }))
+      : campaign.scenes;
+    return { ...campaign, environmentLock: location, scenes };
+  }
+
   function applyLocalDirectorFramework(context) {
     const campaign = context?.campaign;
     if (!campaign || typeof campaign !== 'object') return null;
@@ -93,18 +105,19 @@
     const scenes = Array.isArray(campaign.scenes)
       ? campaign.scenes.map(scene => ({
           ...scene,
-          text: `${scene.text || ''}\n\nSINGLE SCENE OUTPUT\n${singleScene}\n\nLOCATION LOCK\n${location}\n\nSCENE LOGIC LOCK\n${sceneLogic}\n\nPLACEMENT LOGIC LOCK\n${placement}`.trim()
+          text: `LOCATION / ENVIRONMENT LOCK\n${location}\n\n${scene.text || ''}\n\nSINGLE SCENE OUTPUT\n${singleScene}\n\nSCENE LOGIC LOCK\n${sceneLogic}\n\nPLACEMENT LOGIC LOCK\n${placement}`.trim()
         }))
       : campaign.scenes;
 
     return {
       productAccuracy,
+      environmentLock: location,
       scenes
     };
   }
 
   const adapter = {
-    version: '0.5.1',
+    version: '0.5.2',
 
     registerProvider(candidate) {
       assertProvider(candidate);
@@ -145,12 +158,11 @@
     },
 
     async enhanceCampaign(context) {
-      // Local mode always receives the deterministic Director framework.
-      // External providers remain an independent comparison path for now.
       if (!provider || typeof provider.generateCampaign !== 'function') {
         return applyLocalDirectorFramework(context);
       }
-      return provider.generateCampaign(context);
+      const enhanced = await provider.generateCampaign(context);
+      return applyLocationAuthority(context, enhanced);
     }
   };
 
