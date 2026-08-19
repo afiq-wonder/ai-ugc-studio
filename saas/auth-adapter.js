@@ -12,7 +12,7 @@
   }
 
   const auth = {
-    version: '0.1.0',
+    version: '0.1.1',
     registerProvider(candidate) {
       assertProvider(candidate);
       provider = candidate;
@@ -28,6 +28,11 @@
     async signIn(credentials) {
       if (!provider) throw new Error('Authentication provider is not configured yet.');
       return provider.signIn(credentials);
+    },
+    async signUp(credentials) {
+      if (!provider) throw new Error('Authentication provider is not configured yet.');
+      if (typeof provider.signUp !== 'function') throw new Error('Sign-up is not supported by this authentication provider.');
+      return provider.signUp(credentials);
     },
     async signOut() {
       if (!provider) return;
