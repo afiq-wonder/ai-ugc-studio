@@ -11,6 +11,7 @@
     context: null,
     currentCampaignId: null,
     currentFingerprint: null,
+    restoredIdentity: null,
     busy: false,
     bypass: false
   };
@@ -35,8 +36,17 @@
 
   async function productFingerprint() {
     const file = $('product')?.files?.[0] || null;
-    const digest = await fileDigest(file);
-    const basis = [digest, normalize($('name')?.value), normalize($('category')?.value)].join('|');
+    const name = normalize($('name')?.value);
+    const category = normalize($('category')?.value);
+
+    if (!file && state.currentFingerprint && state.restoredIdentity &&
+        name === normalize(state.restoredIdentity.product_name) &&
+        category === normalize(state.restoredIdentity.category)) {
+      return state.currentFingerprint;
+    }
+
+    const digest = file ? await fileDigest(file) : `persisted:${state.currentFingerprint || 'no-image'}`;
+    const basis = [digest, name, category].join('|');
     const bytes = new TextEncoder().encode(basis);
     const hash = await crypto.subtle.digest('SHA-256', bytes);
     return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -71,6 +81,49 @@
     ['scene1','scene2','scene3','cta','hashtags'].forEach(id => { if ($(id)) $(id).textContent = ''; });
   }
 
+  function setField(id, value) {
+    const el = $(id);
+    if (el && value !== undefined && value !== null) el.value = value;
+  }
+
+  function applyPersistedState(payload) {
+    const campaign = payload?.campaign;
+    const revision = payload?.revision;
+    if (!campaign) return false;
+
+    const variables = revision?.variables || campaign.product_variables || {};
+    const output = revision?.output || {};
+
+    state.currentCampaignId = campaign.id;
+    state.currentFingerprint = campaign.product_fingerprint;
+    state.restoredIdentity = {
+      product_name: variables.product_name || campaign.product_name || '',
+      category: variables.category || ''
+    };
+
+    setField('name', variables.product_name || campaign.product_name || '');
+    setField('category', variables.category);
+    setField('platform', variables.platform);
+    setField('language', variables.language);
+    setField('style', variables.style);
+    setField('camera', variables.camera);
+    setField('location', variables.location);
+    setField('action', variables.action);
+
+    if (revision) {
+      if ($('output')) $('output').textContent = output.prompt || 'Prompt will appear here.';
+      if ($('scene1')) $('scene1').textContent = output.scene1 || '';
+      if ($('scene2')) $('scene2').textContent = output.scene2 || '';
+      if ($('scene3')) $('scene3').textContent = output.scene3 || '';
+      if ($('cta')) $('cta').textContent = output.cta || '';
+      if ($('hashtags')) $('hashtags').textContent = output.hashtags || '';
+    }
+
+    const note = $('campaignRestoreState');
+    if (note) note.textContent = `Restored: ${campaign.title || campaign.product_name || 'latest campaign'}`;
+    return true;
+  }
+
   function injectUI() {
     if ($('campaignUsageBar')) return;
     const card = $('build')?.closest('.card');
@@ -79,6 +132,7 @@
     const style = document.createElement('style');
     style.textContent = `
       .campaign-usage{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;padding:11px 13px;border:1px solid var(--line);border-radius:14px;background:#0f131b;color:var(--muted);font-size:12px}.campaign-usage strong{color:var(--text)}
+      .campaign-restore{margin:-6px 0 14px;color:var(--good);font-size:12px}
       .slot-modal-backdrop{position:fixed;inset:0;z-index:999;background:rgba(5,7,11,.78);display:grid;place-items:center;padding:18px}.slot-modal{width:min(520px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 24px 80px rgba(0,0,0,.45)}.slot-modal h3{margin:0 0 10px;font-size:24px}.slot-modal p{color:var(--muted);line-height:1.55}.slot-modal .slot-count{padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#0f131b;margin:14px 0}.slot-modal-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}.slot-modal-actions button{min-width:140px}
     `;
     document.head.appendChild(style);
@@ -88,6 +142,12 @@
     bar.className = 'campaign-usage';
     bar.innerHTML = '<span><strong>Account campaign</strong> · revisions stay in the same campaign</span><span id="campaignUsageState">Checking…</span>';
     card.insertBefore(bar, card.children[1] || null);
+
+    const restore = document.createElement('div');
+    restore.id = 'campaignRestoreState';
+    restore.className = 'campaign-restore';
+    restore.textContent = 'Checking saved campaign…';
+    bar.insertAdjacentElement('afterend', restore);
   }
 
   function renderUsage() {
@@ -108,12 +168,21 @@
     const { data, error } = await sb.rpc('my_campaign_context');
     if (error) throw error;
     state.context = data || { plan: 'starter', used: 0, limit: 3, latest_campaign: null };
-    if (!state.currentCampaignId && state.context.latest_campaign) {
-      state.currentCampaignId = state.context.latest_campaign.id;
-      state.currentFingerprint = state.context.latest_campaign.product_fingerprint;
-    }
     renderUsage();
     return state.context;
+  }
+
+  async function restoreLatestCampaign() {
+    const sb = client();
+    if (!sb) return false;
+    const { data, error } = await sb.rpc('latest_campaign_state');
+    if (error) throw error;
+    if (!data) {
+      const note = $('campaignRestoreState');
+      if (note) note.textContent = 'No saved campaign yet.';
+      return false;
+    }
+    return applyPersistedState(data);
   }
 
   function modal({ title, body, usage, confirmLabel, confirmDisabled }) {
@@ -163,6 +232,7 @@
     if (error) throw error;
     state.currentCampaignId = data.id;
     state.currentFingerprint = fingerprint;
+    state.restoredIdentity = { product_name: variables.product_name || '', category: variables.category || '' };
     return data;
   }
 
@@ -175,6 +245,9 @@
       p_output: output
     });
     if (error) throw error;
+    state.restoredIdentity = { product_name: variables.product_name || '', category: variables.category || '' };
+    const note = $('campaignRestoreState');
+    if (note) note.textContent = `Saved: ${variables.product_name || 'current campaign'}`;
   }
 
   async function runLocalBuild() {
@@ -243,16 +316,21 @@
     });
   }
 
-  function boot() {
+  async function boot() {
     resetAutoOutput();
     injectUI();
     attachBuildGate();
     attachCopyGate();
-    loadContext().catch(error => {
+    try {
+      await loadContext();
+      await restoreLatestCampaign();
+    } catch (error) {
       console.warn(error?.message || error);
       const label = $('campaignUsageState');
       if (label) label.textContent = 'Sign in required';
-    });
+      const note = $('campaignRestoreState');
+      if (note) note.textContent = 'Saved campaign unavailable.';
+    }
   }
 
   boot();
