@@ -21,4 +21,5 @@ function build(){const custom=$('action').value.trim();$('output').textContent=b
 $('build').addEventListener('click',build);$('copy').addEventListener('click',async()=>{if($('output').textContent==='Prompt will appear here.')build();await navigator.clipboard.writeText($('output').textContent);$('copy').textContent='Copied';setTimeout(()=>$('copy').textContent='Copy Prompt',900)});document.querySelectorAll('[data-target]').forEach(btn=>btn.addEventListener('click',async()=>{await navigator.clipboard.writeText($(btn.dataset.target).textContent);const old=btn.textContent;btn.textContent='Copied';setTimeout(()=>btn.textContent=old,900)}));build();
 </script>
 <script src="./saas/campaign-access.js"></script>
+<script src="./saas/reference-storage.js"></script>
 </body></html>
