@@ -66,6 +66,11 @@
     };
   }
 
+  function resetAutoOutput() {
+    if ($('output')) $('output').textContent = 'Prompt will appear here.';
+    ['scene1','scene2','scene3','cta','hashtags'].forEach(id => { if ($(id)) $(id).textContent = ''; });
+  }
+
   function injectUI() {
     if ($('campaignUsageBar')) return;
     const card = $('build')?.closest('.card');
@@ -81,14 +86,13 @@
     const bar = document.createElement('div');
     bar.id = 'campaignUsageBar';
     bar.className = 'campaign-usage';
-    bar.innerHTML = '<span><strong>Account campaign</strong> · checking usage…</span><span id="campaignUsageState">—</span>';
+    bar.innerHTML = '<span><strong>Account campaign</strong> · revisions stay in the same campaign</span><span id="campaignUsageState">Checking…</span>';
     card.insertBefore(bar, card.children[1] || null);
   }
 
   function renderUsage() {
-    const bar = $('campaignUsageBar');
     const label = $('campaignUsageState');
-    if (!bar || !label) return;
+    if (!label) return;
     const c = state.context;
     if (!c) { label.textContent = 'Unavailable'; return; }
     const plan = String(c.plan || 'starter');
@@ -99,7 +103,8 @@
   async function loadContext() {
     const sb = client();
     if (!sb) throw new Error('Sign in through AI UGC Studio before using Director.');
-    await sb.rpc('ensure_my_profile');
+    const profileResult = await sb.rpc('ensure_my_profile');
+    if (profileResult.error) throw profileResult.error;
     const { data, error } = await sb.rpc('my_campaign_context');
     if (error) throw error;
     state.context = data || { plan: 'starter', used: 0, limit: 3, latest_campaign: null };
@@ -173,7 +178,7 @@
   }
 
   async function runLocalBuild() {
-    if (state.busy || state.bypass) return;
+    if (state.busy || state.bypass) return false;
     state.busy = true;
     try {
       const context = await loadContext();
@@ -184,7 +189,7 @@
 
       if (isNewCampaign) {
         const approved = await confirmNewCampaign(context);
-        if (!approved) return;
+        if (!approved) return false;
       }
 
       state.bypass = true;
@@ -194,9 +199,11 @@
       if (isNewCampaign) await createCampaign(fingerprint, variables);
       await recordRevision(variables, campaignOutput());
       await loadContext();
+      return true;
     } catch (error) {
       console.error('Campaign access control failed:', error);
       alert(error?.message || 'Could not verify your campaign allowance. No campaign slot was consumed.');
+      return false;
     } finally {
       state.busy = false;
     }
@@ -214,9 +221,33 @@
     }, true);
   }
 
+  function attachCopyGate() {
+    const button = $('copy');
+    if (!button || button.dataset.campaignGate === '1') return;
+    button.dataset.campaignGate = '1';
+    button.addEventListener('click', event => {
+      if ($('output')?.textContent !== 'Prompt will appear here.') return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      runLocalBuild();
+    }, true);
+    document.querySelectorAll('[data-target]').forEach(btn => {
+      btn.addEventListener('click', event => {
+        const target = $(btn.dataset.target);
+        if (target && !target.textContent.trim()) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          alert('Build the campaign first.');
+        }
+      }, true);
+    });
+  }
+
   function boot() {
+    resetAutoOutput();
     injectUI();
     attachBuildGate();
+    attachCopyGate();
     loadContext().catch(error => {
       console.warn(error?.message || error);
       const label = $('campaignUsageState');
