@@ -18,6 +18,45 @@
     return bits.join(' · ') || 'Saved campaign';
   }
 
+  function setFrameField(doc, id, value) {
+    const el = doc.getElementById(id);
+    if (el && value !== undefined && value !== null) el.value = value;
+  }
+
+  async function openCampaign(id) {
+    const sb = global.AIUGCSupabase;
+    if (!sb || !id) return;
+    const { data, error } = await sb.rpc('campaign_state_by_id', { p_campaign_id: id });
+    if (error) throw error;
+    if (!data || !data.campaign) throw new Error('Campaign not found.');
+
+    const doc = frame.contentDocument;
+    if (!doc) throw new Error('Director is not ready yet.');
+    const campaign = data.campaign;
+    const revision = data.revision;
+    const variables = (revision && revision.variables) || campaign.product_variables || {};
+    const output = (revision && revision.output) || {};
+
+    setFrameField(doc, 'name', variables.product_name || campaign.product_name || '');
+    setFrameField(doc, 'category', variables.category);
+    setFrameField(doc, 'platform', variables.platform);
+    setFrameField(doc, 'language', variables.language);
+    setFrameField(doc, 'style', variables.style);
+    setFrameField(doc, 'camera', variables.camera);
+    setFrameField(doc, 'location', variables.location);
+    setFrameField(doc, 'action', variables.action);
+
+    const text = (id, value) => { const el = doc.getElementById(id); if (el) el.textContent = value || ''; };
+    text('output', output.prompt || 'Prompt will appear here.');
+    text('scene1', output.scene1);
+    text('scene2', output.scene2);
+    text('scene3', output.scene3);
+    text('cta', output.cta);
+    text('hashtags', output.hashtags);
+    text('campaignRestoreState', `Opened from library: ${campaign.title || campaign.product_name || 'campaign'}`);
+    frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   async function load() {
     const sb = global.AIUGCSupabase;
     if (!sb) return;
@@ -52,9 +91,9 @@
           <div class="muted campaign-library-meta">Updated ${formatDate(campaign.updated_at || campaign.created_at)}</div>
         </div>
         <button type="button" class="secondary campaign-library-open">Open / Continue</button>`;
-      item.querySelector('button').addEventListener('click', () => {
-        frame.contentWindow.postMessage({ type: 'aiugc:open-campaign', campaignId: campaign.id }, global.location.origin);
-        frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      item.querySelector('button').addEventListener('click', async () => {
+        try { await openCampaign(campaign.id); }
+        catch (err) { console.error(err); alert(err.message || 'Could not open campaign.'); }
       });
       list.appendChild(item);
     });
@@ -66,5 +105,5 @@
     else list.innerHTML = '';
   });
 
-  global.AIUGCCampaignLibrary = { load };
+  global.AIUGCCampaignLibrary = { load, openCampaign };
 })(window);
