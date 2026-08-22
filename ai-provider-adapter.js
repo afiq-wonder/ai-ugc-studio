@@ -170,9 +170,7 @@
   // when a provider is missing, disabled, out of quota, or temporarily down.
   loadScript('./gemini-provider.js', function () {
     loadScript('./ai-intelligence-integration.js', function () {
-      loadScript('./inventory-fidelity-extension.js', function () {
-        loadScript('./scale-design-fidelity-extension.js');
-      });
+      loadScript('./inventory-fidelity-extension.js');
     });
   });
 })(window);
