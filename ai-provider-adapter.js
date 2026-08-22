@@ -167,7 +167,9 @@
   loadScript('./gemini-provider.js', function () {
     loadScript('./ai-intelligence-integration.js', function () {
       loadScript('./inventory-fidelity-extension.js', function () {
-        loadScript('./product-reference-manifest-extension.js');
+        loadScript('./product-reference-manifest-extension.js', function () {
+          loadScript('./product-existence-gate-extension.js');
+        });
       });
     });
   });
