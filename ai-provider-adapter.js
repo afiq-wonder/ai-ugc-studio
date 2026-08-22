@@ -145,8 +145,6 @@
     },
 
     async enhanceCampaign(context) {
-      // Local mode always receives the deterministic Director framework.
-      // External providers remain an independent comparison path for now.
       if (!provider || typeof provider.generateCampaign !== 'function') {
         return applyLocalDirectorFramework(context);
       }
@@ -166,11 +164,11 @@
     document.head.appendChild(script);
   }
 
-  // Provider modules remain independent so the core product keeps working
-  // when a provider is missing, disabled, out of quota, or temporarily down.
   loadScript('./gemini-provider.js', function () {
     loadScript('./ai-intelligence-integration.js', function () {
-      loadScript('./inventory-fidelity-extension.js');
+      loadScript('./inventory-fidelity-extension.js', function () {
+        loadScript('./product-reference-manifest-extension.js');
+      });
     });
   });
 })(window);
