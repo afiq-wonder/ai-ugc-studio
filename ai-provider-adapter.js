@@ -169,7 +169,9 @@
       loadScript('./inventory-fidelity-extension.js', function () {
         loadScript('./product-reference-manifest-extension.js', function () {
           loadScript('./product-existence-gate-extension.js', function () {
-            loadScript('./strict-scene-preflight-extension.js');
+            loadScript('./strict-scene-preflight-extension.js', function () {
+              loadScript('./last-chance-no-host-fallback-extension.js');
+            });
           });
         });
       });
