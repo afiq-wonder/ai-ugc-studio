@@ -3,19 +3,26 @@
 
   async function getStatus() {
     const sb = global.AIUGCSupabase;
-    if (!sb) return { plan: 'starter', subscription: null };
+    if (!sb) return { plan: 'free', paid_at: null, founder_number: null, purchase_price_rm: null };
     const { data, error } = await sb.rpc('my_billing_status');
     if (error) throw error;
-    return data || { plan: 'starter', subscription: null };
+    return data || { plan: 'free', paid_at: null, founder_number: null, purchase_price_rm: null };
   }
 
-  async function startCheckout(plan) {
-    const normalized = String(plan || '').toLowerCase();
-    if (!['pro', 'agency'].includes(normalized)) throw new Error('Unsupported plan.');
-    const event = new CustomEvent('aiugc:checkout-requested', { detail: { plan: normalized } });
+  async function getOffer() {
+    const sb = global.AIUGCSupabase;
+    if (!sb) throw new Error('Billing provider is unavailable.');
+    const { data, error } = await sb.rpc('current_checkout_offer');
+    if (error) throw error;
+    return data;
+  }
+
+  async function startCheckout() {
+    const offer = await getOffer();
+    const event = new CustomEvent('aiugc:checkout-requested', { detail: { offer } });
     global.dispatchEvent(event);
-    return { ok: false, pendingProvider: true, plan: normalized };
+    return { ok: false, pendingProvider: true, offer };
   }
 
-  global.AIUGCBilling = { getStatus, startCheckout };
+  global.AIUGCBilling = { getStatus, getOffer, startCheckout };
 })(window);
