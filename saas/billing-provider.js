@@ -18,10 +18,24 @@
   }
 
   async function startCheckout() {
+    const sb = global.AIUGCSupabase;
+    if (!sb) throw new Error('Billing provider is unavailable.');
+
     const offer = await getOffer();
-    const event = new CustomEvent('aiugc:checkout-requested', { detail: { offer } });
-    global.dispatchEvent(event);
-    return { ok: false, pendingProvider: true, offer };
+    const { data, error } = await sb.functions.invoke('create-kakiugc-checkout', {
+      body: { site_url: global.location.origin }
+    });
+    if (error) throw error;
+    if (!data?.url) {
+      const reason = data?.error === 'stripe_not_configured'
+        ? 'Checkout is not live yet. Stripe configuration is still required.'
+        : (data?.detail || data?.error || 'Could not start checkout.');
+      throw new Error(reason);
+    }
+
+    global.dispatchEvent(new CustomEvent('aiugc:checkout-started', { detail: { offer, session_id: data.session_id } }));
+    global.location.assign(data.url);
+    return { ok: true, offer, session_id: data.session_id };
   }
 
   global.AIUGCBilling = { getStatus, getOffer, startCheckout };
