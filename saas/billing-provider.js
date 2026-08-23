@@ -1,12 +1,14 @@
 (function (global) {
   'use strict';
 
+  const emptyStatus = () => ({ plan: 'free', paid_at: null, founder_number: null, purchase_price_rm: null, beta_expires_at: null, beta_active: false });
+
   async function getStatus() {
     const sb = global.AIUGCSupabase;
-    if (!sb) return { plan: 'free', paid_at: null, founder_number: null, purchase_price_rm: null };
+    if (!sb) return emptyStatus();
     const { data, error } = await sb.rpc('my_billing_status');
     if (error) throw error;
-    return data || { plan: 'free', paid_at: null, founder_number: null, purchase_price_rm: null };
+    return data || emptyStatus();
   }
 
   async function getOffer() {
