@@ -70,6 +70,7 @@
       const context = {
         input: {
           product: document.getElementById('name')?.value.trim() || 'the promoted product',
+          category: document.getElementById('category')?.value || 'other',
           platform: document.getElementById('platform')?.value || 'TikTok',
           market: 'Malaysia',
           language: document.getElementById('language')?.value || 'English',
@@ -124,7 +125,7 @@
     panel.style.marginTop = '16px';
     panel.innerHTML = `
       <h3>Enhanced — USE YOUR OWN API KEY <span style="font-size:11px;color:var(--good);font-weight:700">OPTIONAL</span></h3>
-      <div class="sub">Director v1.3.3 Local Mode remains the default full engine. Enhanced Intelligence is an optional BYOK comparison path for users who want Gemini perception, evidence and discovery on top of the Director.</div>
+      <div class="sub">Director v1.3.4 Local Mode remains the default full engine. Enhanced Intelligence is an optional BYOK comparison path for users who want Gemini perception, evidence and discovery on top of the Director.</div>
       <div class="form">
         <div>
           <label>Gemini API key — session only</label>
@@ -145,7 +146,7 @@
         <button class="secondary" id="enableProductIntelligence" type="button">Enable Enhanced Intelligence</button>
         <button class="secondary" id="buildEnhancedCampaign" type="button" disabled>Build Enhanced Campaign</button>
         <button class="secondary" id="disableProductIntelligence" type="button">Use Local Mode</button>
-        <span id="productIntelligenceStatus" style="align-self:center;color:var(--muted);font-size:12px">Local Mode · Director v1.3.3</span>
+        <span id="productIntelligenceStatus" style="align-self:center;color:var(--muted);font-size:12px">Local Mode · Director v1.3.4</span>
       </div>`;
 
     campaignCard.insertAdjacentElement('afterend', panel);
@@ -185,7 +186,7 @@
       global.AIProviderAdapter.clearProvider();
       key.value = '';
       enhancedBuild.disabled = true;
-      status.textContent = 'Local Mode · Director v1.3.3';
+      status.textContent = 'Local Mode · Director v1.3.4';
     });
   }
 
@@ -197,7 +198,7 @@
       installPanel();
     } else if (polls >= MAX_POLLS) {
       clearInterval(timer);
-      console.warn('Enhanced Intelligence unavailable; Director v1.3.3 Local Mode remains active.');
+      console.warn('Enhanced Intelligence unavailable; Director v1.3.4 Local Mode remains active.');
     }
   }, POLL_MS);
 })(window);
