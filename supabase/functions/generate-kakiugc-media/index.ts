@@ -13,6 +13,8 @@ function json(body: unknown, status = 200) {
   });
 }
 
+type RefImage = { role?: string; mimeType?: string; data?: string };
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -34,6 +36,9 @@ Deno.serve(async (req) => {
     const kind = body?.kind;
     const campaignId = body?.campaignId;
     const prompt = String(body?.prompt || "").trim();
+    const references: RefImage[] = Array.isArray(body?.references) ? body.references.slice(0, 3) : [];
+    const firstFrame = body?.firstFrame && body.firstFrame.data ? body.firstFrame : null;
+
     if (!campaignId || !prompt || !["image", "video"].includes(kind)) {
       return json({ error: "invalid_request" }, 400);
     }
@@ -56,6 +61,14 @@ Deno.serve(async (req) => {
 
     try {
       if (kind === "image") {
+        const input: unknown[] = [];
+        for (const ref of references) {
+          if (!ref?.data) continue;
+          if (ref.role) input.push({ type: "text", text: `${String(ref.role).toUpperCase()} REFERENCE follows. Use only for the role described in the campaign prompt.` });
+          input.push({ type: "image", mime_type: ref.mimeType || "image/jpeg", data: ref.data });
+        }
+        input.push({ type: "text", text: prompt });
+
         const r = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
           method: "POST",
           headers: {
@@ -64,7 +77,7 @@ Deno.serve(async (req) => {
           },
           body: JSON.stringify({
             model,
-            input: prompt,
+            input,
             response_format: {
               type: "image",
               mime_type: "image/jpeg",
@@ -93,7 +106,22 @@ Deno.serve(async (req) => {
         if (!imageData) throw new Error("image_payload_missing");
 
         await sb.rpc("complete_generation", { p_usage_id: usageId, p_succeeded: true });
-        return json({ kind, model, mimeType, data: imageData });
+        return json({ kind, model, mimeType, data: imageData, usageId });
+      }
+
+      const instance: Record<string, unknown> = { prompt };
+      if (firstFrame?.data) {
+        instance.image = {
+          inlineData: {
+            mimeType: firstFrame.mimeType || "image/jpeg",
+            data: firstFrame.data,
+          },
+        };
+      } else if (references.length) {
+        instance.referenceImages = references.filter((ref) => ref?.data).map((ref) => ({
+          image: { inlineData: { mimeType: ref.mimeType || "image/jpeg", data: ref.data } },
+          referenceType: "asset",
+        }));
       }
 
       const start = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:predictLongRunning`, {
@@ -103,7 +131,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          instances: [{ prompt }],
+          instances: [instance],
           parameters: {
             numberOfVideos: 1,
             resolution: "720p",
@@ -115,8 +143,7 @@ Deno.serve(async (req) => {
       const startPayload = await start.json();
       if (!start.ok || !startPayload?.name) throw new Error(startPayload?.error?.message || "video_generation_failed");
 
-      await sb.rpc("complete_generation", { p_usage_id: usageId, p_succeeded: true });
-      return json({ kind, model, operationName: startPayload.name, status: "processing" });
+      return json({ kind, model, operationName: startPayload.name, usageId, status: "processing" });
     } catch (generationError) {
       if (usageId) await sb.rpc("complete_generation", { p_usage_id: usageId, p_succeeded: false });
       throw generationError;
