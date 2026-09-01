@@ -1,1 +1,0 @@
-Trigger Vercel preview for staging/bulky-appliance-handling. No runtime logic changes.
