@@ -40,9 +40,9 @@
 
   function errorMessage(error){
     const raw=String(error?.message||error||'Generation failed.');
-    if(raw.includes('free_image_used'))return 'Your free image has already been generated. Upgrade to generate another image.';
-    if(raw.includes('free_video_used'))return 'Your free 8-second video has already been generated. Upgrade to generate another video.';
-    if(raw.includes('generation_in_progress'))return 'A generation is already processing. Please wait for it to finish.';
+    if(raw.includes('free_image_consumed'))return 'Your free image has already been generated. Upgrade to generate another image.';
+    if(raw.includes('free_video_consumed'))return 'Your free 8-second video has already been generated. Upgrade to generate another video.';
+    if(raw.includes('generation_reservation_not_found'))return 'This generation session expired. Please try again.';
     return raw;
   }
 
