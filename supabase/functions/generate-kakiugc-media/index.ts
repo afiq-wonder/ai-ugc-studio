@@ -69,22 +69,31 @@ Deno.serve(async (req) => {
       if (usageId) await sb.rpc("complete_generation", { p_usage_id: usageId, p_succeeded: succeeded });
     }
 
-    // Reuse the same proven FLUX.2 [dev] generation family and parameters used by KakiTryOn.
-    // Generators remain replaceable adapters; KakiUGC only adapts references, prompt and 9:16 output.
+    // Surgical FLUX path: identity first, product second. Scene refs are intentionally excluded here
+    // until creator fidelity is proven. Scene intent still comes from the Director prompt.
     async function generateWithFal() {
       if (!falKey) throw new Error("fal_key_missing");
 
-      const usableRefs = references.filter((ref) => Boolean(ref?.data));
+      const creatorRef = references.find((ref) => ref?.role === "creator" && ref?.data);
+      const productRef = references.find((ref) => ref?.role === "product" && ref?.data);
+      const usableRefs = [creatorRef, productRef].filter(Boolean) as RefImage[];
       const hasRefs = usableRefs.length > 0;
       const model = hasRefs ? "fal-ai/flux-2/edit" : "fal-ai/flux-2";
-      const estimatedCostUsd = 0.012 * (hasRefs ? Math.min(usableRefs.length, 3) + 1 : 1);
+      const estimatedCostUsd = 0.012 * (hasRefs ? usableRefs.length + 1 : 1);
       const reservation = await reserve("fal", model, estimatedCostUsd, null);
       const usageId = reservation?.id;
 
+      const identityLock = creatorRef
+        ? `\n\nIDENTITY LOCK — HIGHEST PRIORITY:\nImage 1 is the CREATOR identity reference. Preserve this exact person. Keep the same facial structure, face shape, skin tone, hairstyle, hairline, facial hair, eyewear if present, apparent age, body build and overall proportions. Do not beautify, slim, age-shift, masculinize/feminize, substitute, average, or reinterpret the creator. The generated person must remain recognizably the same individual as Image 1.\n`
+        : "";
+      const productLock = productRef
+        ? `\nPRODUCT LOCK:\nImage ${creatorRef ? 2 : 1} is the PRODUCT reference. Preserve the garment's color, collar, sleeve treatment, logos/marks, typography, stripes, proportions and visible design details. Use this image only for product appearance; it must not influence the creator's face or body identity.\n`
+        : "";
+      const finalPrompt = `${identityLock}${productLock}\nSCENE DIRECTION:\n${prompt}\n\nPRIORITY ORDER: creator identity first, product fidelity second, scene/composition third. If any scene instruction conflicts with preserving the creator, preserve the creator.`.trim();
+
       try {
         const payload: Record<string, unknown> = {
-          prompt,
-          // Exact 9:16 custom output; FLUX.2 accepts custom dimensions from 512–2048 px.
+          prompt: finalPrompt,
           image_size: { width: 720, height: 1280 },
           num_images: 1,
           guidance_scale: 2.5,
