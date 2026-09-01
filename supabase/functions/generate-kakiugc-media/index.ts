@@ -43,7 +43,8 @@ Deno.serve(async (req) => {
       return json({ error: "invalid_request" }, 400);
     }
 
-    const durationSeconds = kind === "video" ? 8 : 0;
+    // Images do not consume a duration allowance. Videos consume the locked V1 8-second allowance.
+    const durationSeconds: number | null = kind === "video" ? 8 : null;
     const provider = "google";
     const model = kind === "image" ? "gemini-3.1-flash-image" : "veo-3.1-generate-preview";
 
