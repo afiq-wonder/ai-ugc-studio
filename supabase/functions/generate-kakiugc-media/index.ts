@@ -69,28 +69,36 @@ Deno.serve(async (req) => {
       if (usageId) await sb.rpc("complete_generation", { p_usage_id: usageId, p_succeeded: succeeded });
     }
 
+    // Reuse the same proven FLUX.2 [dev] generation family and parameters used by KakiTryOn.
+    // Generators remain replaceable adapters; KakiUGC only adapts references, prompt and 9:16 output.
     async function generateWithFal() {
       if (!falKey) throw new Error("fal_key_missing");
-      const hasRefs = references.some((ref) => Boolean(ref?.data));
-      const model = hasRefs ? "fal-ai/flux-2/turbo/edit" : "fal-ai/flux-2/turbo";
-      const estimatedCostUsd = hasRefs ? 0.008 * (Math.min(references.filter((r) => r?.data).length, 3) + 1) : 0.008;
+
+      const usableRefs = references.filter((ref) => Boolean(ref?.data));
+      const hasRefs = usableRefs.length > 0;
+      const model = hasRefs ? "fal-ai/flux-2/edit" : "fal-ai/flux-2";
+      const estimatedCostUsd = 0.012 * (hasRefs ? Math.min(usableRefs.length, 3) + 1 : 1);
       const reservation = await reserve("fal", model, estimatedCostUsd, null);
       const usageId = reservation?.id;
 
       try {
         const payload: Record<string, unknown> = {
           prompt,
-          image_size: "portrait_16_9",
+          // Exact 9:16 custom output; FLUX.2 accepts custom dimensions from 512–2048 px.
+          image_size: { width: 720, height: 1280 },
           num_images: 1,
           guidance_scale: 2.5,
+          num_inference_steps: 28,
+          acceleration: "regular",
           enable_prompt_expansion: false,
           enable_safety_checker: true,
           output_format: "jpeg",
         };
+
         if (hasRefs) {
-          payload.image_urls = references
-            .filter((ref) => ref?.data)
-            .map((ref) => `data:${ref.mimeType || "image/jpeg"};base64,${ref.data}`);
+          payload.image_urls = usableRefs.map(
+            (ref) => `data:${ref.mimeType || "image/jpeg"};base64,${ref.data}`,
+          );
         }
 
         const response = await fetch(`https://fal.run/${model}`, {
@@ -196,7 +204,7 @@ Deno.serve(async (req) => {
         return json(await generateWithFal());
       } catch (error) {
         falError = error;
-        console.error("FLUX primary failed; escalating to Gemini", error);
+        console.error("FLUX.2 primary failed; escalating to Gemini", error);
       }
 
       try {
