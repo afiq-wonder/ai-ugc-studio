@@ -29,9 +29,26 @@
     return out;
   }
 
-  async function currentCampaign(){
+  async function ensureSignedIn(status){
     const client=sb();
-    if(!client)throw new Error('Please generate your campaign and sign in first.');
+    if(!client){
+      status.textContent='Sign up or sign in to unlock your free media.';
+      $('build')?.click();
+      return null;
+    }
+    const {data,error}=await client.auth.getSession();
+    if(error)throw error;
+    if(!data?.session){
+      status.textContent='Sign up or sign in to unlock your free media. Your prompts remain available.';
+      $('build')?.click();
+      return null;
+    }
+    return client;
+  }
+
+  async function currentCampaign(status){
+    const client=await ensureSignedIn(status);
+    if(!client)return null;
     const {data,error}=await client.rpc('latest_campaign_state');
     if(error)throw error;
     if(!data?.campaign?.id)throw new Error('Generate and save the campaign first.');
@@ -40,6 +57,7 @@
 
   function errorMessage(error){
     const raw=String(error?.message||error||'Generation failed.');
+    if(raw.includes('permission denied for function latest_campaign_state'))return 'Sign up or sign in to unlock your free media.';
     if(raw.includes('free_image_consumed'))return 'Your free image has already been generated. Upgrade to generate another image.';
     if(raw.includes('free_video_consumed'))return 'Your free 8-second video has already been generated. Upgrade to generate another video.';
     if(raw.includes('generation_reservation_not_found'))return 'This generation session expired. Please try again.';
@@ -55,7 +73,7 @@
     document.head.appendChild(style);
     const panel=document.createElement('section');
     panel.id='aiugcMediaPanel';panel.className='card';panel.style.marginTop='16px';
-    panel.innerHTML=`<h3>6. Generate your free media</h3><div class="sub">Your campaign prompts stay copyable. The free account includes one 9:16 image and one 8-second video.</div><div class="media-grid"><div class="media-box"><h4 style="margin-top:0">Free image</h4><img id="aiugcGeneratedImage" alt="Generated KakiUGC image"><div id="aiugcImageState" class="media-state">Generate the campaign first, then create your included image.</div><div class="media-actions"><button id="aiugcGenerateImage" type="button" class="primary">Generate Image</button></div><div class="media-note">Uses your Creator, Product and optional Scene references with the Director prompt.</div></div><div class="media-box"><h4 style="margin-top:0">Free 8-second video</h4><video id="aiugcGeneratedVideo" controls playsinline></video><div id="aiugcVideoState" class="media-state">For best continuity, generate the image first. It becomes the opening frame for your video.</div><div class="media-actions"><button id="aiugcGenerateVideo" type="button" class="primary">Generate 8s Video</button></div><div class="media-note">Video generation is asynchronous and may take a few minutes.</div></div></div>`;
+    panel.innerHTML=`<h3>6. Generate your free media</h3><div class="sub">Your campaign prompts stay copyable. Sign up to unlock one 9:16 image and one 8-second video.</div><div class="media-grid"><div class="media-box"><h4 style="margin-top:0">Free image</h4><img id="aiugcGeneratedImage" alt="Generated KakiUGC image"><div id="aiugcImageState" class="media-state">Sign up or sign in to unlock your included image.</div><div class="media-actions"><button id="aiugcGenerateImage" type="button" class="primary">Generate Image</button></div><div class="media-note">Uses your Creator, Product and optional Scene references with the Director prompt.</div></div><div class="media-box"><h4 style="margin-top:0">Free 8-second video</h4><video id="aiugcGeneratedVideo" controls playsinline></video><div id="aiugcVideoState" class="media-state">Sign up or sign in to unlock your included 8-second video.</div><div class="media-actions"><button id="aiugcGenerateVideo" type="button" class="primary">Generate 8s Video</button></div><div class="media-note">For best continuity, generate the image first. Video generation may take a few minutes.</div></div></div>`;
     campaign.insertAdjacentElement('afterend',panel);
     $('aiugcGenerateImage').addEventListener('click',generateImage);
     $('aiugcGenerateVideo').addEventListener('click',generateVideo);
@@ -64,13 +82,15 @@
   async function generateImage(){
     if(mediaState.busyImage)return;
     const button=$('aiugcGenerateImage'),status=$('aiugcImageState'),img=$('aiugcGeneratedImage');
-    mediaState.busyImage=true;button.disabled=true;status.classList.remove('good');status.textContent='Creating your image…';
+    mediaState.busyImage=true;button.disabled=true;status.classList.remove('good');status.textContent='Checking your free image…';
     try{
-      const client=sb();if(!client)throw new Error('Please generate your campaign and sign in first.');
-      const campaign=await currentCampaign();
+      const campaign=await currentCampaign(status);
+      if(!campaign){button.disabled=false;return;}
+      const client=sb();
       const prompt=$('scene1')?.textContent?.trim()||$('output')?.textContent?.trim();
       if(!prompt||prompt==='Prompt will appear here.')throw new Error('Generate the campaign first.');
       const refs=await references();
+      status.textContent='Creating your image…';
       const {data,error}=await client.functions.invoke('generate-kakiugc-media',{body:{kind:'image',campaignId:campaign.id,prompt,references:refs}});
       if(error)throw error;if(data?.error)throw new Error(data.error);if(!data?.data)throw new Error('Image response was empty.');
       mediaState.imageData=data.data;mediaState.imageMime=data.mimeType||'image/jpeg';
@@ -104,15 +124,17 @@
   async function generateVideo(){
     if(mediaState.busyVideo)return;
     const button=$('aiugcGenerateVideo'),status=$('aiugcVideoState'),video=$('aiugcGeneratedVideo');
-    mediaState.busyVideo=true;button.disabled=true;status.classList.remove('good');status.textContent='Starting your 8-second video…';
+    mediaState.busyVideo=true;button.disabled=true;status.classList.remove('good');status.textContent='Checking your free video…';
     try{
-      const client=sb();if(!client)throw new Error('Please generate your campaign and sign in first.');
-      const campaign=await currentCampaign();
+      const campaign=await currentCampaign(status);
+      if(!campaign){button.disabled=false;return;}
+      const client=sb();
       const prompt=$('scene2')?.textContent?.trim()||$('output')?.textContent?.trim();
       if(!prompt||prompt==='Prompt will appear here.')throw new Error('Generate the campaign first.');
       const refs=await references();
       const body={kind:'video',campaignId:campaign.id,prompt,references:refs};
       if(mediaState.imageData)body.firstFrame={mimeType:mediaState.imageMime,data:mediaState.imageData};
+      status.textContent='Starting your 8-second video…';
       const {data,error}=await client.functions.invoke('generate-kakiugc-media',{body});
       if(error)throw error;if(data?.error)throw new Error(data.error);if(!data?.operationName||!data?.usageId)throw new Error('Video job did not start correctly.');
       status.textContent='Video job started. Processing…';
