@@ -84,12 +84,25 @@
     try{
       const session=await requestAuthentication();if(!session)return false;
       const context=await loadContext();
+
+      // Free accounts own exactly one campaign. If it already exists, always reuse it
+      // after refresh/re-entry and treat edits as revisions inside that campaign.
+      if(context.plan==='free' && context.latest_campaign?.id && !state.currentCampaignId){
+        state.currentCampaignId=context.latest_campaign.id;
+        state.currentFingerprint=context.latest_campaign.product_fingerprint||null;
+      }
+
       const fingerprint=await productFingerprint();
       const variables=productVariables();
       const existingFingerprint=state.currentFingerprint||context.latest_campaign?.product_fingerprint||null;
-      const isNewCampaign=!state.currentCampaignId||!existingFingerprint||fingerprint!==existingFingerprint;
+      const freeExistingCampaign=context.plan==='free' && !!(state.currentCampaignId||context.latest_campaign?.id);
+      const isNewCampaign=!freeExistingCampaign && (!state.currentCampaignId||!existingFingerprint||fingerprint!==existingFingerprint);
+
       state.bypass=true;try{global.build()}finally{state.bypass=false}
+
       if(isNewCampaign)await createCampaign(fingerprint,variables);
+      else if(!state.currentCampaignId && context.latest_campaign?.id)state.currentCampaignId=context.latest_campaign.id;
+
       await recordRevision(variables,campaignOutput());
       await loadContext();
       return true;
