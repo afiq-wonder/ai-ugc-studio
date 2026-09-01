@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b12">
+<meta name="description" content="KakiUGC turns creator and product references into a complete AI UGC campaign with ready-to-use scenes, prompts and one included image.">
+<title>KakiUGC — AI UGC Studio</title>
+<style>
+:root{--bg:#080b12;--panel:#101521;--panel2:#0d111b;--line:#242b3d;--text:#f7f8fb;--muted:#9ca6b6;--purple:#7047ff;--violet:#a487ff;--yellow:#ffd84d;--yellowText:#17140b;--soft:#141226;--good:#7ee2b8;--shadow:0 28px 90px rgba(0,0,0,.34)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#241750 0,#0d0b19 34%,#080b12 62%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}a{color:inherit;text-decoration:none}.shell{width:min(1160px,100%);margin:auto;padding:0 18px 56px}.topbar{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:12px}.brandmark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#7047ff,#4a2fb9);box-shadow:0 12px 34px rgba(112,71,255,.28);font-weight:950}.brandcopy strong{display:block;font-size:20px;letter-spacing:-.02em}.brandcopy span{display:block;color:var(--violet);font-size:12px;margin-top:3px}.nav{display:flex;align-items:center;gap:9px}.btn{min-height:46px;border-radius:14px;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;border:1px solid var(--line);transition:transform .16s ease,box-shadow .16s ease}.btn:hover{transform:translateY(-1px)}.btn.secondary{background:#141226;color:#c7baff;border-color:#332b52}.btn.primary{background:var(--yellow);color:var(--yellowText);border:0;box-shadow:0 10px 34px rgba(255,216,77,.16)}.hero{padding:70px 0 46px;text-align:center}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid #332b52;background:#141226;color:#c7baff;font-size:12px;font-weight:850}.hero h1{font-size:clamp(48px,8vw,82px);line-height:.95;letter-spacing:-.055em;margin:22px auto 0;max-width:930px}.hero h1 em{font-style:normal;color:#b7a8ff}.hero p{font-size:18px;line-height:1.62;color:var(--muted);max-width:720px;margin:22px auto 0}.hero-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:28px}.hero-actions .btn{min-height:56px;padding:0 22px}.micro{font-size:12px;color:#7f8999;margin-top:13px}.preview{margin-top:20px;border:1px solid #31294f;background:linear-gradient(180deg,#111522,#0b0e16);border-radius:30px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}.preview:before{content:"";position:absolute;width:360px;height:360px;border-radius:50%;left:50%;top:-250px;transform:translateX(-50%);background:radial-gradient(circle,rgba(112,71,255,.28),transparent 68%);pointer-events:none}.window{border:1px solid var(--line);background:#0d111b;border-radius:22px;overflow:hidden;position:relative}.windowbar{min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;border-bottom:1px solid var(--line);background:#101521}.dots{display:flex;gap:6px}.dots i{display:block;width:8px;height:8px;border-radius:50%;background:#353c4e}.version{border:1px solid #332b52;background:#141226;color:#c7baff;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:850}.director{display:grid;grid-template-columns:.78fr 1.22fr;min-height:420px}.inputs{padding:22px;border-right:1px solid var(--line);display:grid;gap:12px;background:#0c1018}.inputcard{border:1px dashed #5745a1;border-radius:18px;padding:18px;background:radial-gradient(circle at center,#18142f 0,#0d111b 68%)}.inputcard small{display:block;color:var(--violet);font-weight:850;margin-bottom:7px}.inputcard strong{display:block}.inputcard span{display:block;color:#7f8999;font-size:12px;margin-top:6px}.outputpanel{padding:24px;text-align:left}.outputhead{display:flex;align-items:center;justify-content:space-between;gap:12px}.outputhead h3{margin:0;font-size:21px}.ready{color:var(--good);font-size:12px;font-weight:850}.scenegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:18px}.scene{border:1px solid var(--line);background:#101521;border-radius:16px;padding:16px;min-height:142px}.scene b{display:block;font-size:12px;color:#c7baff;margin-bottom:9px}.scene strong{font-size:15px;line-height:1.35}.scene p{font-size:12px;line-height:1.5;color:var(--muted);margin:9px 0 0}.promptrow{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:11px}.promptbox{border:1px solid var(--line);background:#0d111b;border-radius:16px;padding:15px}.promptbox small{color:#7f8999}.promptbox strong{display:block;margin-top:6px}.section{padding-top:82px}.sectionhead{text-align:center;max-width:700px;margin:0 auto 30px}.kicker{color:var(--violet);font-weight:900;font-size:12px;letter-spacing:.11em;text-transform:uppercase}.sectionhead h2{font-size:clamp(34px,5vw,48px);letter-spacing:-.045em;margin:10px 0 0}.sectionhead p{color:var(--muted);line-height:1.6;margin:13px auto 0}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(18,22,35,.96),rgba(12,15,25,.96));border-radius:24px;padding:22px;box-shadow:0 18px 48px rgba(0,0,0,.16)}.step{width:38px;height:38px;border-radius:12px;background:#18142f;color:#c7baff;display:grid;place-items:center;font-weight:950;margin-bottom:18px}.card h3{font-size:19px;margin:0}.card p{color:var(--muted);line-height:1.58;margin:9px 0 0}.benefitgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.benefit{min-height:190px}.benefit .icon{font-size:28px;margin-bottom:18px}.benefit h3{font-size:22px}.free{margin-top:82px;border:1px solid #3a315f;background:radial-gradient(circle at top,#1e173d,#111323 70%);border-radius:30px;padding:42px;text-align:center;box-shadow:var(--shadow)}.free .pill{display:inline-flex;padding:8px 11px;border-radius:999px;border:1px solid #51418f;color:#c9baff;background:#100e1b;font-size:12px;font-weight:900}.free h2{font-size:clamp(36px,6vw,56px);letter-spacing:-.05em;margin:16px 0 0}.free p{max-width:650px;margin:14px auto 0;color:#bec5d2;line-height:1.62}.free ul{max-width:660px;margin:24px auto 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;text-align:left}.free li{border:1px solid var(--line);background:#101521;border-radius:14px;padding:13px 14px;color:#dfe3ea}.free li:before{content:"✓";color:var(--good);font-weight:950;margin-right:8px}.free .btn{min-height:58px;min-width:260px;margin-top:24px}.privacy{font-size:11px;color:#7f8999;line-height:1.55;max-width:680px;margin:12px auto 0}.faq{display:grid;gap:11px;max-width:840px;margin:auto}details{border:1px solid var(--line);background:#101521;border-radius:17px;padding:17px 19px}summary{cursor:pointer;font-weight:850}details p{color:var(--muted);line-height:1.6;margin-bottom:0}.final{margin-top:82px;border:1px solid #31294f;background:linear-gradient(180deg,#111522,#0b0e16);border-radius:30px;padding:48px 24px;text-align:center}.final h2{font-size:clamp(36px,6vw,54px);letter-spacing:-.05em;margin:0}.final p{color:var(--muted);line-height:1.62;max-width:640px;margin:13px auto 22px}.footer{padding:28px 0 6px;display:flex;justify-content:space-between;gap:16px;color:#7f8999;font-size:12px}.footer a{color:#aeb6c4}
+@media(max-width:880px){.director{grid-template-columns:1fr}.inputs{border-right:0;border-bottom:1px solid var(--line)}.scenegrid{grid-template-columns:1fr}.three{grid-template-columns:1fr}.benefitgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.shell{padding:0 12px 40px}.topbar{min-height:68px}.brandcopy span{display:none}.nav .secondary{display:none}.hero{padding:48px 2px 30px}.hero p{font-size:16px}.hero-actions{display:grid}.hero-actions .btn{width:100%}.preview{padding:9px;border-radius:23px}.window{border-radius:18px}.director{min-height:0}.inputs,.outputpanel{padding:15px}.promptrow,.benefitgrid,.free ul{grid-template-columns:1fr}.section{padding-top:58px}.free{margin-top:58px;padding:30px 18px}.free .btn{width:100%;min-width:0}.final{margin-top:58px;padding:36px 18px}.footer{flex-direction:column;text-align:center}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="topbar">
+  <a class="brand" href="/landing/" aria-label="KakiUGC home"><div class="brandmark">K</div><div class="brandcopy"><strong>KakiUGC</strong><span>AI UGC Studio</span></div></a>
+  <nav class="nav"><a class="btn secondary" href="/saas/">Sign in</a><a class="btn primary" href="/">Start free</a></nav>
+</header>
+
+<section class="hero">
+  <span class="eyebrow">AI UGC STUDIO · DIRECTOR v1.3.7</span>
+  <h1>Turn a product into a <em>campaign.</em></h1>
+  <p>Upload your creator and product. KakiUGC directs the hook, demonstration, CTA and production prompts — so you can create UGC without starting from a blank page.</p>
+  <div class="hero-actions"><a class="btn primary" href="/">Create my free campaign ✨</a><a class="btn secondary" href="#how">See how it works</a></div>
+  <div class="micro">1 free campaign · full copyable prompts · 1 included 9:16 image</div>
+</section>
+
+<section class="preview" aria-label="KakiUGC product preview">
+  <div class="window">
+    <div class="windowbar"><div class="dots"><i></i><i></i><i></i></div><span class="version">Director v1.3.7</span></div>
+    <div class="director">
+      <div class="inputs">
+        <div class="inputcard"><small>01 · CREATOR</small><strong>Your creator reference</strong><span>Identity stays the priority.</span></div>
+        <div class="inputcard"><small>02 · PRODUCT</small><strong>Your product reference</strong><span>Details, shape and branding stay recognizable.</span></div>
+        <div class="inputcard"><small>03 · SCENE</small><strong>Optional scene reference</strong><span>Use it when you want tighter visual direction.</span></div>
+      </div>
+      <div class="outputpanel">
+        <div class="outputhead"><h3>Your campaign</h3><span class="ready">✓ Director ready</span></div>
+        <div class="scenegrid">
+          <div class="scene"><b>SCENE 1 · HOOK</b><strong>Stop the scroll.</strong><p>A specific opening visual and angle built around the product.</p></div>
+          <div class="scene"><b>SCENE 2 · DEMO</b><strong>Show the value.</strong><p>A believable product demonstration with clear production direction.</p></div>
+          <div class="scene"><b>SCENE 3 · CTA</b><strong>Close naturally.</strong><p>A result-led ending with a usable recommendation and CTA.</p></div>
+        </div>
+        <div class="promptrow"><div class="promptbox"><small>Production prompts</small><strong>Copy. Generate here or anywhere.</strong></div><div class="promptbox"><small>Included image</small><strong>One vertical 9:16 generation.</strong></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="sectionhead"><div class="kicker">How it works</div><h2>Three inputs. One directed campaign.</h2><p>KakiUGC does the campaign thinking first, then gives you production-ready prompts you can actually use.</p></div>
+  <div class="three">
+    <article class="card"><div class="step">1</div><h3>Bring the references</h3><p>Add a creator and product. Add a scene only when you want to guide the environment or composition.</p></article>
+    <article class="card"><div class="step">2</div><h3>Let the Director build</h3><p>KakiUGC turns your inputs into Hook, Demonstration and Result/CTA scenes with camera, action and continuity direction.</p></article>
+    <article class="card"><div class="step">3</div><h3>Generate your way</h3><p>Create the included image inside KakiUGC, then copy the prompts into the AI tools you already use for the rest of production.</p></article>
+  </div>
+</section>
+
+<section class="section">
+  <div class="sectionhead"><div class="kicker">Why KakiUGC</div><h2>The intelligence layer, not another generator.</h2><p>Generators change. Your campaign direction should not. KakiUGC keeps the workflow portable.</p></div>
+  <div class="benefitgrid">
+    <article class="card benefit"><div class="icon">🎬</div><h3>Campaign Director</h3><p>Go beyond one prompt. Get a complete three-scene campaign with a clear job for every scene.</p></article>
+    <article class="card benefit"><div class="icon">🧩</div><h3>Reference control</h3><p>Creator, product and scene references each have a defined role so the output has a better chance of staying coherent.</p></article>
+    <article class="card benefit"><div class="icon">📋</div><h3>Portable prompts</h3><p>Your prompts stay copyable. Use them in the generation tools that fit your workflow and budget.</p></article>
+    <article class="card benefit"><div class="icon">⚡</div><h3>Less prompt engineering</h3><p>Choose the campaign details in a guided workflow instead of rebuilding a complicated prompt every time.</p></article>
+  </div>
+</section>
+
+<section class="free" id="free">
+  <span class="pill">FREE ACCOUNT BENEFIT</span>
+  <h2>Build one real campaign free.</h2>
+  <p>Try the actual workflow before deciding whether KakiUGC belongs in your creator stack.</p>
+  <ul><li>1 complete campaign</li><li>Hook, Demo & CTA scenes</li><li>Full copyable prompts</li><li>1 included 9:16 image</li></ul>
+  <a class="btn primary" href="/">Start my free campaign ✨</a>
+  <div class="privacy">🔒 Your uploaded files are used to create your result. KakiUGC does not need to retain the original files to make the campaign workflow useful.</div>
+</section>
+
+<section class="section">
+  <div class="sectionhead"><div class="kicker">FAQ</div><h2>Before you start.</h2></div>
+  <div class="faq">
+    <details><summary>Do I need to know prompt engineering?</summary><p>No. The workflow is designed to collect the campaign decisions and turn them into structured production prompts for you.</p></details>
+    <details><summary>Can I use the prompts outside KakiUGC?</summary><p>Yes. The campaign prompts are meant to stay portable so you can copy them into your preferred compatible AI tools.</p></details>
+    <details><summary>What is included with the free account?</summary><p>One complete campaign, the full campaign prompts and one included vertical image generation.</p></details>
+    <details><summary>Does KakiUGC include free video generation?</summary><p>Not in the current free offer. Your video prompts remain copyable so you can use them with the video generator you prefer.</p></details>
+  </div>
+</section>
+
+<section class="final"><h2>Stop guessing what to post.</h2><p>Give KakiUGC the creator and the product. Let the Director turn them into something you can actually produce.</p><a class="btn primary" href="/">Create my free campaign ✨</a></section>
+<footer class="footer"><span>Made by KakiWonder Works</span><span>KakiUGC · AI UGC Studio · Director v1.3.7</span></footer>
+</main>
+</body>
+</html>
