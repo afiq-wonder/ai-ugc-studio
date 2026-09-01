@@ -84,23 +84,14 @@
     try{
       const session=await requestAuthentication();if(!session)return false;
       const context=await loadContext();
-
-      if(context.plan==='free' && context.latest_campaign?.id && !state.currentCampaignId){
-        state.currentCampaignId=context.latest_campaign.id;
-        state.currentFingerprint=context.latest_campaign.product_fingerprint||null;
-      }
-
+      if(context.plan==='free' && context.latest_campaign?.id && !state.currentCampaignId){state.currentCampaignId=context.latest_campaign.id;state.currentFingerprint=context.latest_campaign.product_fingerprint||null;}
       const fingerprint=await productFingerprint();
       const variables=productVariables();
       const existingFingerprint=state.currentFingerprint||context.latest_campaign?.product_fingerprint||null;
       const freeExistingCampaign=context.plan==='free' && !!(state.currentCampaignId||context.latest_campaign?.id);
       const isNewCampaign=!freeExistingCampaign && (!state.currentCampaignId||!existingFingerprint||fingerprint!==existingFingerprint);
-
       state.bypass=true;try{global.build()}finally{state.bypass=false}
-
-      if(isNewCampaign)await createCampaign(fingerprint,variables);
-      else if(!state.currentCampaignId && context.latest_campaign?.id)state.currentCampaignId=context.latest_campaign.id;
-
+      if(isNewCampaign)await createCampaign(fingerprint,variables);else if(!state.currentCampaignId && context.latest_campaign?.id)state.currentCampaignId=context.latest_campaign.id;
       await recordRevision(variables,campaignOutput());
       await loadContext();
       return true;
