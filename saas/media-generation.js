@@ -31,18 +31,10 @@
 
   async function ensureSignedIn(status){
     const client=sb();
-    if(!client){
-      status.textContent='Sign up or sign in to unlock your free media.';
-      $('build')?.click();
-      return null;
-    }
+    if(!client){status.textContent='Sign up or sign in to unlock your free media.';$('build')?.click();return null;}
     const {data,error}=await client.auth.getSession();
     if(error)throw error;
-    if(!data?.session){
-      status.textContent='Sign up or sign in to unlock your free media. Your prompts remain available.';
-      $('build')?.click();
-      return null;
-    }
+    if(!data?.session){status.textContent='Sign up or sign in to unlock your free media. Your prompts remain available.';$('build')?.click();return null;}
     return client;
   }
 
@@ -64,12 +56,31 @@
     return raw;
   }
 
+  async function edgeErrorMessage(error){
+    try{
+      const response=error?.context;
+      if(response && typeof response.clone==='function'){
+        const clone=response.clone();
+        const type=clone.headers?.get?.('content-type')||'';
+        if(type.includes('application/json')){
+          const payload=await clone.json();
+          if(payload?.error)return String(payload.error);
+          if(payload?.message)return String(payload.message);
+        }else{
+          const text=await clone.text();
+          if(text)return text.slice(0,500);
+        }
+      }
+    }catch(_){ }
+    return errorMessage(error);
+  }
+
   function inject(){
     if($('aiugcMediaPanel'))return;
     const campaign=document.querySelector('.campaign');
     if(!campaign)return;
     const style=document.createElement('style');
-    style.textContent='.media-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.media-box{border:1px solid var(--line);border-radius:16px;background:#0f131b;padding:14px}.media-box img,.media-box video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:12px;background:#090b10;display:none}.media-state{min-height:20px;margin:10px 0;color:var(--muted);font-size:13px;line-height:1.45}.media-state.good{color:var(--good)}.media-actions{display:flex;gap:8px;flex-wrap:wrap}.media-actions button{flex:1}.media-note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.45}@media(max-width:760px){.media-grid{grid-template-columns:1fr}}';
+    style.textContent='.media-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.media-box{border:1px solid var(--line);border-radius:16px;background:#0f131b;padding:14px}.media-box img,.media-box video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:12px;background:#090b10;display:none}.media-state{min-height:20px;margin:10px 0;color:var(--muted);font-size:13px;line-height:1.45;overflow-wrap:anywhere}.media-state.good{color:var(--good)}.media-actions{display:flex;gap:8px;flex-wrap:wrap}.media-actions button{flex:1}.media-note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.45}@media(max-width:760px){.media-grid{grid-template-columns:1fr}}';
     document.head.appendChild(style);
     const panel=document.createElement('section');
     panel.id='aiugcMediaPanel';panel.className='card';panel.style.marginTop='16px';
@@ -84,15 +95,16 @@
     const button=$('aiugcGenerateImage'),status=$('aiugcImageState'),img=$('aiugcGeneratedImage');
     mediaState.busyImage=true;button.disabled=true;status.classList.remove('good');status.textContent='Checking your free image…';
     try{
-      const campaign=await currentCampaign(status);
-      if(!campaign){button.disabled=false;return;}
+      const campaign=await currentCampaign(status);if(!campaign){button.disabled=false;return;}
       const client=sb();
       const prompt=$('scene1')?.textContent?.trim()||$('output')?.textContent?.trim();
       if(!prompt||prompt==='Prompt will appear here.')throw new Error('Generate the campaign first.');
       const refs=await references();
       status.textContent='Creating your image…';
       const {data,error}=await client.functions.invoke('generate-kakiugc-media',{body:{kind:'image',campaignId:campaign.id,prompt,references:refs}});
-      if(error)throw error;if(data?.error)throw new Error(data.error);if(!data?.data)throw new Error('Image response was empty.');
+      if(error)throw new Error(await edgeErrorMessage(error));
+      if(data?.error)throw new Error(data.error);
+      if(!data?.data)throw new Error('Image response was empty.');
       mediaState.imageData=data.data;mediaState.imageMime=data.mimeType||'image/jpeg';
       img.src=`data:${mediaState.imageMime};base64,${mediaState.imageData}`;img.style.display='block';
       status.textContent='Image ready. Your free image entitlement is now used.';status.classList.add('good');button.textContent='Image Generated';
@@ -106,7 +118,8 @@
       await new Promise(r=>setTimeout(r,10000));
       status.textContent=`Video processing… ${Math.floor((attempt+1)*10/60)}m ${((attempt+1)*10)%60}s`;
       const {data,error}=await client.functions.invoke('kakiugc-video-status',{body:{operationName,usageId}});
-      if(error)throw error;if(data?.error)throw new Error(data.error);
+      if(error)throw new Error(await edgeErrorMessage(error));
+      if(data?.error)throw new Error(data.error);
       if(data?.done)return data.video;
     }
     throw new Error('Video is still processing. Please try again shortly.');
@@ -115,7 +128,7 @@
   async function loadVideoBlob(uri){
     const client=sb();
     const {data,error}=await client.functions.invoke('kakiugc-video-file',{body:{uri}});
-    if(error)throw error;
+    if(error)throw new Error(await edgeErrorMessage(error));
     if(data instanceof Blob)return data;
     if(data instanceof ArrayBuffer)return new Blob([data],{type:'video/mp4'});
     throw new Error('Could not load the generated video file.');
@@ -126,8 +139,7 @@
     const button=$('aiugcGenerateVideo'),status=$('aiugcVideoState'),video=$('aiugcGeneratedVideo');
     mediaState.busyVideo=true;button.disabled=true;status.classList.remove('good');status.textContent='Checking your free video…';
     try{
-      const campaign=await currentCampaign(status);
-      if(!campaign){button.disabled=false;return;}
+      const campaign=await currentCampaign(status);if(!campaign){button.disabled=false;return;}
       const client=sb();
       const prompt=$('scene2')?.textContent?.trim()||$('output')?.textContent?.trim();
       if(!prompt||prompt==='Prompt will appear here.')throw new Error('Generate the campaign first.');
@@ -136,7 +148,9 @@
       if(mediaState.imageData)body.firstFrame={mimeType:mediaState.imageMime,data:mediaState.imageData};
       status.textContent='Starting your 8-second video…';
       const {data,error}=await client.functions.invoke('generate-kakiugc-media',{body});
-      if(error)throw error;if(data?.error)throw new Error(data.error);if(!data?.operationName||!data?.usageId)throw new Error('Video job did not start correctly.');
+      if(error)throw new Error(await edgeErrorMessage(error));
+      if(data?.error)throw new Error(data.error);
+      if(!data?.operationName||!data?.usageId)throw new Error('Video job did not start correctly.');
       status.textContent='Video job started. Processing…';
       const ready=await pollVideo(data.operationName,data.usageId);
       if(!ready?.uri)throw new Error('Video finished without a downloadable file.');
